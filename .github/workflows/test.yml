@@ -12,7 +12,6 @@ jobs:
     with:
       with_linting: true
       with_musl: true
-      with_windows: true
-      ios_scheme_name: swift-wallet
+      ios_scheme_name: swift-wallet-Package
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
