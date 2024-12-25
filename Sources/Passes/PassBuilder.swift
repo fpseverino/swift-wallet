@@ -52,7 +52,12 @@ public struct PassBuilder: Sendable {
         return try encoder.encode(manifest)
     }
 
-    private func signature(for manifest: Data) throws -> Data {
+    /// Generates a signature for a given manifest or personalization token.
+    ///
+    /// - Parameter manifest: The manifest or personalization token data to sign.
+    ///
+    /// - Returns: The generated signature as `Data`.
+    public func signature(for manifest: Data) throws -> Data {
         // Swift Crypto doesn't support encrypted PEM private keys, so we have to use OpenSSL for that.
         if let pemPrivateKeyPassword {
             guard FileManager.default.fileExists(atPath: self.openSSLURL.path) else {
