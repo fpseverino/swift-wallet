@@ -1,10 +1,9 @@
 import Foundation
 import Testing
+import WalletPasses
 
-@testable import Passes
-
-@Suite("Passes Tests")
-struct PassesTests {
+@Suite("WalletPasses Tests")
+struct WalletPassesTests {
     @Test("Build Pass")
     func build() throws {
         let builder = PassBuilder(
@@ -15,7 +14,7 @@ struct PassesTests {
 
         let bundle = try builder.build(
             pass: TestPass(),
-            sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/PassesTests/SourceFiles"
+            sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests/SourceFiles"
         )
 
         #expect(bundle != nil)
@@ -32,7 +31,7 @@ struct PassesTests {
 
         let bundle = try builder.build(
             pass: TestPass(),
-            sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/PassesTests/SourceFiles"
+            sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests/SourceFiles"
         )
 
         #expect(bundle != nil)
@@ -56,7 +55,7 @@ struct PassesTests {
 
         let bundle = try builder.build(
             pass: TestPass(),
-            sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/PassesTests/SourceFiles",
+            sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests/SourceFiles",
             personalization: testPersonalization
         )
 
@@ -71,10 +70,10 @@ struct PassesTests {
             pemPrivateKey: TestCertificate.pemPrivateKey
         )
 
-        #expect(throws: PassesError.noSourceFiles) {
+        #expect(throws: WalletPassesError.noSourceFiles) {
             try builder.build(
                 pass: TestPass(),
-                sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/PassesTests/NoSourceFiles"
+                sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests/NoSourceFiles"
             )
         }
     }
@@ -89,10 +88,10 @@ struct PassesTests {
             openSSLPath: "/usr/bin/no-openssl"
         )
 
-        #expect(throws: PassesError.noOpenSSLExecutable) {
+        #expect(throws: WalletPassesError.noOpenSSLExecutable) {
             try builder.build(
                 pass: TestPass(),
-                sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/PassesTests/SourceFiles"
+                sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests/SourceFiles"
             )
         }
     }

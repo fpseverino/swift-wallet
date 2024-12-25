@@ -23,9 +23,9 @@ Use the SPM string to easily include the dependendency in your `Package.swift` f
 and add the product you want to use to your target's dependencies:
 
 ```swift
-.product(name: "Passes", package: "swift-wallet")
+.product(name: "WalletPasses", package: "swift-wallet")
 ```
 
 ```swift
-.product(name: "Orders", package: "swift-wallet")
+.product(name: "WalletOrders", package: "swift-wallet")
 ```
