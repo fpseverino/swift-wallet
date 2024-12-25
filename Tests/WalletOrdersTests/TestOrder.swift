@@ -1,5 +1,5 @@
 import Foundation
-import Orders
+import WalletOrders
 
 struct TestOrder: OrderJSON.Properties {
     var schemaVersion = OrderJSON.SchemaVersion.v1

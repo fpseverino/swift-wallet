@@ -1,5 +1,5 @@
 import Foundation
-import Passes
+import WalletPasses
 
 struct TestPass: PassJSON.Properties {
     var description = "Test Pass"

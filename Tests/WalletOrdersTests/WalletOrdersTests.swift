@@ -1,10 +1,9 @@
 import Foundation
 import Testing
+import WalletOrders
 
-@testable import Orders
-
-@Suite("Orders Tests")
-struct OrdersTests {
+@Suite("WalletOrders Tests")
+struct WalletOrdersTests {
     @Test("Build Order")
     func build() throws {
         let builder = OrderBuilder(
@@ -15,7 +14,7 @@ struct OrdersTests {
 
         let bundle = try builder.build(
             order: TestOrder(),
-            sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/OrdersTests/SourceFiles"
+            sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletOrdersTests/SourceFiles"
         )
 
         #expect(bundle != nil)
@@ -32,7 +31,7 @@ struct OrdersTests {
 
         let bundle = try builder.build(
             order: TestOrder(),
-            sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/OrdersTests/SourceFiles"
+            sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletOrdersTests/SourceFiles"
         )
 
         #expect(bundle != nil)
@@ -46,10 +45,10 @@ struct OrdersTests {
             pemPrivateKey: TestCertificate.pemPrivateKey
         )
 
-        #expect(throws: OrdersError.noSourceFiles) {
+        #expect(throws: WalletOrdersError.noSourceFiles) {
             try builder.build(
                 order: TestOrder(),
-                sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/OrdersTests/NoSourceFiles"
+                sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletOrdersTests/NoSourceFiles"
             )
         }
     }
@@ -64,10 +63,10 @@ struct OrdersTests {
             openSSLPath: "/usr/bin/no-openssl"
         )
 
-        #expect(throws: OrdersError.noOpenSSLExecutable) {
+        #expect(throws: WalletOrdersError.noOpenSSLExecutable) {
             try builder.build(
                 order: TestOrder(),
-                sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/OrdersTests/SourceFiles"
+                sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletOrdersTests/SourceFiles"
             )
         }
     }

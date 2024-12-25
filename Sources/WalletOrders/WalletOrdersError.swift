@@ -1,11 +1,10 @@
-/// Errors that can be thrown by Apple Wallet passes.
-public struct PassesError: Error, Sendable, Equatable {
-    /// The type of the errors that can be thrown by Apple Wallet passes.
+/// Errors that can be thrown by Apple Wallet orders.
+public struct WalletOrdersError: Error, Sendable, Equatable {
+    /// The type of the errors that can be thrown by Apple Wallet orders.
     public struct ErrorType: Sendable, Hashable, CustomStringConvertible, Equatable {
         enum Base: String, Sendable, Equatable {
             case noSourceFiles
             case noOpenSSLExecutable
-            case invalidNumberOfPasses
         }
 
         let base: Base
@@ -18,8 +17,6 @@ public struct PassesError: Error, Sendable, Equatable {
         public static let noSourceFiles = Self(.noSourceFiles)
         /// The `openssl` executable is missing.
         public static let noOpenSSLExecutable = Self(.noOpenSSLExecutable)
-        /// The number of passes to bundle is invalid.
-        public static let invalidNumberOfPasses = Self(.invalidNumberOfPasses)
 
         /// A textual representation of this error.
         public var description: String {
@@ -34,7 +31,7 @@ public struct PassesError: Error, Sendable, Equatable {
             self.errorType = errorType
         }
 
-        static func == (lhs: PassesError.Backing, rhs: PassesError.Backing) -> Bool {
+        static func == (lhs: WalletOrdersError.Backing, rhs: WalletOrdersError.Backing) -> Bool {
             lhs.errorType == rhs.errorType
         }
     }
@@ -54,17 +51,14 @@ public struct PassesError: Error, Sendable, Equatable {
     /// The `openssl` executable is missing.
     public static let noOpenSSLExecutable = Self(errorType: .noOpenSSLExecutable)
 
-    /// The number of passes to bundle is invalid.
-    public static let invalidNumberOfPasses = Self(errorType: .invalidNumberOfPasses)
-
-    public static func == (lhs: PassesError, rhs: PassesError) -> Bool {
+    public static func == (lhs: WalletOrdersError, rhs: WalletOrdersError) -> Bool {
         lhs.backing == rhs.backing
     }
 }
 
-extension PassesError: CustomStringConvertible {
+extension WalletOrdersError: CustomStringConvertible {
     /// A textual representation of this error.
     public var description: String {
-        "PassesError(errorType: \(self.errorType))"
+        "WalletOrdersError(errorType: \(self.errorType))"
     }
 }

@@ -3,8 +3,8 @@ import Foundation
 @_spi(CMS) import X509
 import Zip
 
-/// A builder for generating order content bundles.
-public struct OrderBuilder: Sendable {
+/// A builder for generating pass content bundles.
+public struct PassBuilder: Sendable {
     private let pemWWDRCertificate: String
     private let pemCertificate: String
     private let pemPrivateKey: String
@@ -13,12 +13,12 @@ public struct OrderBuilder: Sendable {
 
     private let encoder = JSONEncoder()
 
-    /// Creates a new ``OrderBuilder``.
+    /// Creates a new ``PassBuilder``.
     ///
     /// - Parameters:
     ///   - pemWWDRCertificate: Apple's WWDR.pem certificate in PEM format.
-    ///   - pemCertificate: The PEM Certificate for signing orders.
-    ///   - pemPrivateKey: The PEM Certificate's private key for signing orders.
+    ///   - pemCertificate: The PEM Certificate for signing passes.
+    ///   - pemPrivateKey: The PEM Certificate's private key for signing passes.
     ///   - pemPrivateKeyPassword: The password to the private key. If the key is not encrypted it must be `nil`. Defaults to `nil`.
     ///   - openSSLPath: The location of the `openssl` command as a file path.
     public init(
@@ -45,18 +45,23 @@ public struct OrderBuilder: Sendable {
                 continue
             }
 
-            let hash = try SHA256.hash(data: Data(contentsOf: file))
+            let hash = try Insecure.SHA1.hash(data: Data(contentsOf: file))
             manifest[relativePath] = hash.map { "0\(String($0, radix: 16))".suffix(2) }.joined()
         }
 
         return try encoder.encode(manifest)
     }
 
-    private func signature(for manifest: Data) throws -> Data {
+    /// Generates a signature for a given manifest or personalization token.
+    ///
+    /// - Parameter manifest: The manifest or personalization token data to sign.
+    ///
+    /// - Returns: The generated signature as `Data`.
+    public func signature(for manifest: Data) throws -> Data {
         // Swift Crypto doesn't support encrypted PEM private keys, so we have to use OpenSSL for that.
         if let pemPrivateKeyPassword {
             guard FileManager.default.fileExists(atPath: self.openSSLURL.path) else {
-                throw OrdersError.noOpenSSLExecutable
+                throw WalletPassesError.noOpenSSLExecutable
             }
 
             let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
@@ -100,22 +105,24 @@ public struct OrderBuilder: Sendable {
         }
     }
 
-    /// Generates the order content bundle for a given order.
+    /// Generates the pass content bundle for a given pass.
     ///
     /// - Parameters:
-    ///   - order: The order to generate the content for.
+    ///   - pass: The pass to generate the content for.
     ///   - sourceFilesDirectoryPath: The path to the source files directory.
+    ///   - personalization: The personalization information for the pass.
     ///
-    /// - Returns: The generated order content as `Data`.
+    /// - Returns: The generated pass content as `Data`.
     public func build(
-        order: some OrderJSON.Properties,
-        sourceFilesDirectoryPath: String
+        pass: some PassJSON.Properties,
+        sourceFilesDirectoryPath: String,
+        personalization: PersonalizationJSON? = nil
     ) throws -> Data {
         let filesDirectory = URL(fileURLWithPath: sourceFilesDirectoryPath, isDirectory: true)
         guard
             (try? filesDirectory.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
         else {
-            throw OrdersError.noSourceFiles
+            throw WalletPassesError.noSourceFiles
         }
 
         let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
@@ -124,9 +131,16 @@ public struct OrderBuilder: Sendable {
 
         var files: [ArchiveFile] = []
 
-        let orderJSON = try self.encoder.encode(order)
-        try orderJSON.write(to: tempDir.appendingPathComponent("order.json"))
-        files.append(ArchiveFile(filename: "order.json", data: orderJSON))
+        let passJSON = try self.encoder.encode(pass)
+        try passJSON.write(to: tempDir.appendingPathComponent("pass.json"))
+        files.append(ArchiveFile(filename: "pass.json", data: passJSON))
+
+        // Pass Personalization
+        if let personalization {
+            let personalizationJSONData = try self.encoder.encode(personalization)
+            try personalizationJSONData.write(to: tempDir.appendingPathComponent("personalization.json"))
+            files.append(ArchiveFile(filename: "personalization.json", data: personalizationJSONData))
+        }
 
         let manifest = try self.manifest(for: tempDir)
         files.append(ArchiveFile(filename: "manifest.json", data: manifest))
@@ -142,7 +156,7 @@ public struct OrderBuilder: Sendable {
             try files.append(ArchiveFile(filename: relativePath, data: Data(contentsOf: file)))
         }
 
-        let zipFile = tempDir.appendingPathComponent("\(UUID().uuidString).order")
+        let zipFile = tempDir.appendingPathComponent("\(UUID().uuidString).pkpass")
         try Zip.zipData(archiveFiles: files, zipFilePath: zipFile)
         return try Data(contentsOf: zipFile)
     }
