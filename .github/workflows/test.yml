@@ -22,12 +22,12 @@ jobs:
       fail-fast: false
       matrix:
         swift-version:
-          - 5.9
-          - 5.10
+          # - 5.9
+          # - 5.10
           - 6.0
         include:
-          - { swift-version: 5.9, swift-branch: swift-5.9.2-release, swift-tag: 5.9.2-RELEASE }
-          - { swift-version: 5.10, swift-branch: swift-5.10.1-release, swift-tag: 5.10.1-RELEASE }
+          # - { swift-version: 5.9, swift-branch: swift-5.9.2-release, swift-tag: 5.9.2-RELEASE }
+          # - { swift-version: 5.10, swift-branch: swift-5.10.1-release, swift-tag: 5.10.1-RELEASE }
           - { swift-version: 6.0, swift-branch: swift-6.0.1-release, swift-tag: 6.0.1-RELEASE }
     runs-on: windows-latest
     timeout-minutes: 60

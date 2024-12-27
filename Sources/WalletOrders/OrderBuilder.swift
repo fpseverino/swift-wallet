@@ -56,7 +56,7 @@ public struct OrderBuilder: Sendable {
         // Swift Crypto doesn't support encrypted PEM private keys, so we have to use OpenSSL for that.
         if let pemPrivateKeyPassword {
             #if !os(macOS) && !os(Linux) && !os(Windows)
-                throw WalletPassesError.noOpenSSLExecutable
+                throw WalletOrdersError.noOpenSSLExecutable
             #else
                 guard FileManager.default.fileExists(atPath: self.openSSLURL.path) else {
                     throw WalletOrdersError.noOpenSSLExecutable
