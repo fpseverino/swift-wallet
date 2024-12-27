@@ -60,36 +60,40 @@ public struct PassBuilder: Sendable {
     public func signature(for manifest: Data) throws -> Data {
         // Swift Crypto doesn't support encrypted PEM private keys, so we have to use OpenSSL for that.
         if let pemPrivateKeyPassword {
-            guard FileManager.default.fileExists(atPath: self.openSSLURL.path) else {
+            #if !os(macOS) && !os(Linux) && !os(Windows)
                 throw WalletPassesError.noOpenSSLExecutable
-            }
+            #else
+                guard FileManager.default.fileExists(atPath: self.openSSLURL.path) else {
+                    throw WalletPassesError.noOpenSSLExecutable
+                }
 
-            let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
-            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-            defer { try? FileManager.default.removeItem(at: dir) }
+                let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+                try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+                defer { try? FileManager.default.removeItem(at: dir) }
 
-            try manifest.write(to: dir.appendingPathComponent("manifest.json"))
-            try self.pemWWDRCertificate.write(to: dir.appendingPathComponent("wwdr.pem"), atomically: true, encoding: .utf8)
-            try self.pemCertificate.write(to: dir.appendingPathComponent("certificate.pem"), atomically: true, encoding: .utf8)
-            try self.pemPrivateKey.write(to: dir.appendingPathComponent("private.pem"), atomically: true, encoding: .utf8)
+                try manifest.write(to: dir.appendingPathComponent("manifest.json"))
+                try self.pemWWDRCertificate.write(to: dir.appendingPathComponent("wwdr.pem"), atomically: true, encoding: .utf8)
+                try self.pemCertificate.write(to: dir.appendingPathComponent("certificate.pem"), atomically: true, encoding: .utf8)
+                try self.pemPrivateKey.write(to: dir.appendingPathComponent("private.pem"), atomically: true, encoding: .utf8)
 
-            let process = Process()
-            process.currentDirectoryURL = dir
-            process.executableURL = self.openSSLURL
-            process.arguments = [
-                "smime", "-binary", "-sign",
-                "-certfile", dir.appendingPathComponent("wwdr.pem").path,
-                "-signer", dir.appendingPathComponent("certificate.pem").path,
-                "-inkey", dir.appendingPathComponent("private.pem").path,
-                "-in", dir.appendingPathComponent("manifest.json").path,
-                "-out", dir.appendingPathComponent("signature").path,
-                "-outform", "DER",
-                "-passin", "pass:\(pemPrivateKeyPassword)",
-            ]
-            try process.run()
-            process.waitUntilExit()
+                let process = Process()
+                process.currentDirectoryURL = dir
+                process.executableURL = self.openSSLURL
+                process.arguments = [
+                    "smime", "-binary", "-sign",
+                    "-certfile", dir.appendingPathComponent("wwdr.pem").path,
+                    "-signer", dir.appendingPathComponent("certificate.pem").path,
+                    "-inkey", dir.appendingPathComponent("private.pem").path,
+                    "-in", dir.appendingPathComponent("manifest.json").path,
+                    "-out", dir.appendingPathComponent("signature").path,
+                    "-outform", "DER",
+                    "-passin", "pass:\(pemPrivateKeyPassword)",
+                ]
+                try process.run()
+                process.waitUntilExit()
 
-            return try Data(contentsOf: dir.appendingPathComponent("signature"))
+                return try Data(contentsOf: dir.appendingPathComponent("signature"))
+            #endif
         } else {
             let signature = try CMS.sign(
                 manifest,

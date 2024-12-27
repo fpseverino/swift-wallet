@@ -12,5 +12,46 @@ jobs:
     with:
       with_linting: true
       with_musl: true
+      ios_scheme_name: swift-wallet-Package
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  
+  windows-unit:
+    if: ${{ !(github.event.pull_request.draft || false) }}
+    strategy:
+      fail-fast: false
+      matrix:
+        swift-version:
+          - 5.9
+          - 5.10
+          - 6.0
+        include:
+          - { swift-version: 5.9, swift-branch: swift-5.9.2-release, swift-tag: 5.9.2-RELEASE }
+          - { swift-version: 5.10, swift-branch: swift-5.10.1-release, swift-tag: 5.10.1-RELEASE }
+          - { swift-version: 6.0, swift-branch: swift-6.0.1-release, swift-tag: 6.0.1-RELEASE }
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - name: Install Windows Swift toolchain
+        uses: compnerd/gha-setup-swift@main
+        with:
+          branch: ${{ matrix.swift-branch }}
+          tag: ${{ matrix.swift-tag }}
+      - name: Download zlib
+        run: |
+          curl -L -o zlib.zip https://www.zlib.net/zlib131.zip
+          mkdir zlib-131
+          tar -xf zlib.zip -C zlib-131 --strip-components=1
+      - name: Build and install zlib
+        run: |
+          cd zlib-131
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build . --config Release
+          cmake --install . --prefix ../install
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Run unit tests
+        run: |
+          swift test -Xcc -I'C:/Program Files (x86)/zlib/include' -Xlinker -L'C:/Program Files (x86)/zlib/lib'
