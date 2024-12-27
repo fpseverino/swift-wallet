@@ -14,29 +14,30 @@ struct WalletPassesTests {
 
         let bundle = try builder.build(
             pass: TestPass(),
-            sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests/SourceFiles"
+            sourceFilesDirectoryPath: NSString(#filePath).deletingLastPathComponent + "/SourceFiles"
         )
 
         #expect(bundle != nil)
     }
 
-    @available(macOS 11.0, *)
-    @Test("Build Pass with Encrypted Key")
-    func buildEncrypted() throws {
-        let builder = PassBuilder(
-            pemWWDRCertificate: TestCertificate.pemWWDRCertificate,
-            pemCertificate: TestCertificate.encryptedPemCertificate,
-            pemPrivateKey: TestCertificate.encryptedPemPrivateKey,
-            pemPrivateKeyPassword: "password"
-        )
+    #if os(macOS) || os(Linux)
+        @Test("Build Pass with Encrypted Key")
+        func buildEncrypted() throws {
+            let builder = PassBuilder(
+                pemWWDRCertificate: TestCertificate.pemWWDRCertificate,
+                pemCertificate: TestCertificate.encryptedPemCertificate,
+                pemPrivateKey: TestCertificate.encryptedPemPrivateKey,
+                pemPrivateKeyPassword: "password"
+            )
 
-        let bundle = try builder.build(
-            pass: TestPass(),
-            sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests/SourceFiles"
-        )
+            let bundle = try builder.build(
+                pass: TestPass(),
+                sourceFilesDirectoryPath: NSString(#filePath).deletingLastPathComponent + "/SourceFiles"
+            )
 
-        #expect(bundle != nil)
-    }
+            #expect(bundle != nil)
+        }
+    #endif
 
     @Test("Build Pass with Personalization")
     func buildPersonalized() throws {
@@ -56,7 +57,7 @@ struct WalletPassesTests {
 
         let bundle = try builder.build(
             pass: TestPass(),
-            sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests/SourceFiles",
+            sourceFilesDirectoryPath: NSString(#filePath).deletingLastPathComponent + "/SourceFiles",
             personalization: testPersonalization
         )
 
@@ -74,7 +75,7 @@ struct WalletPassesTests {
         #expect(throws: WalletPassesError.noSourceFiles) {
             try builder.build(
                 pass: TestPass(),
-                sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests/NoSourceFiles"
+                sourceFilesDirectoryPath: NSString(#filePath).deletingLastPathComponent + "/NoSourceFiles"
             )
         }
     }
@@ -92,7 +93,7 @@ struct WalletPassesTests {
         #expect(throws: WalletPassesError.noOpenSSLExecutable) {
             try builder.build(
                 pass: TestPass(),
-                sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests/SourceFiles"
+                sourceFilesDirectoryPath: NSString(#filePath).deletingLastPathComponent + "/SourceFiles"
             )
         }
     }

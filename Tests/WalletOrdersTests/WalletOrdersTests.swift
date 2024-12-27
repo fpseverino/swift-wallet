@@ -14,29 +14,30 @@ struct WalletOrdersTests {
 
         let bundle = try builder.build(
             order: TestOrder(),
-            sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletOrdersTests/SourceFiles"
+            sourceFilesDirectoryPath: NSString(#filePath).deletingLastPathComponent + "/SourceFiles"
         )
 
         #expect(bundle != nil)
     }
 
-    @available(macOS 11.0, *)
-    @Test("Build Order with Encrypted Key")
-    func buildEncrypted() throws {
-        let builder = OrderBuilder(
-            pemWWDRCertificate: TestCertificate.pemWWDRCertificate,
-            pemCertificate: TestCertificate.encryptedPemCertificate,
-            pemPrivateKey: TestCertificate.encryptedPemPrivateKey,
-            pemPrivateKeyPassword: "password"
-        )
+    #if os(macOS) || os(Linux)
+        @Test("Build Order with Encrypted Key")
+        func buildEncrypted() throws {
+            let builder = OrderBuilder(
+                pemWWDRCertificate: TestCertificate.pemWWDRCertificate,
+                pemCertificate: TestCertificate.encryptedPemCertificate,
+                pemPrivateKey: TestCertificate.encryptedPemPrivateKey,
+                pemPrivateKeyPassword: "password"
+            )
 
-        let bundle = try builder.build(
-            order: TestOrder(),
-            sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletOrdersTests/SourceFiles"
-        )
+            let bundle = try builder.build(
+                order: TestOrder(),
+                sourceFilesDirectoryPath: NSString(#filePath).deletingLastPathComponent + "/SourceFiles"
+            )
 
-        #expect(bundle != nil)
-    }
+            #expect(bundle != nil)
+        }
+    #endif
 
     @Test("Build Pass without Source Files")
     func buildWithoutSourceFiles() throws {
@@ -49,7 +50,7 @@ struct WalletOrdersTests {
         #expect(throws: WalletOrdersError.noSourceFiles) {
             try builder.build(
                 order: TestOrder(),
-                sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletOrdersTests/NoSourceFiles"
+                sourceFilesDirectoryPath: NSString(#filePath).deletingLastPathComponent + "/NoSourceFiles"
             )
         }
     }
@@ -67,7 +68,7 @@ struct WalletOrdersTests {
         #expect(throws: WalletOrdersError.noOpenSSLExecutable) {
             try builder.build(
                 order: TestOrder(),
-                sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletOrdersTests/SourceFiles"
+                sourceFilesDirectoryPath: NSString(#filePath).deletingLastPathComponent + "/SourceFiles"
             )
         }
     }
