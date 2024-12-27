@@ -5,9 +5,9 @@ let package = Package(
     name: "swift-wallet",
     platforms: [
         .macOS(.v11),
-        .iOS(.v14),
-        .tvOS(.v14),
-        .watchOS(.v7),
+        .iOS(.v15),
+        .tvOS(.v15),
+        .watchOS(.v8),
     ],
     products: [
         .library(name: "WalletPasses", targets: ["WalletPasses"]),

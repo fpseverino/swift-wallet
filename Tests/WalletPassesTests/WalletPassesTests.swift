@@ -20,7 +20,7 @@ struct WalletPassesTests {
         #expect(bundle != nil)
     }
 
-    @available(macOS 11.0, Windows 10, *)
+    @available(macOS 11.0, *)
     @Test("Build Pass with Encrypted Key")
     func buildEncrypted() throws {
         let builder = PassBuilder(
@@ -79,7 +79,6 @@ struct WalletPassesTests {
         }
     }
 
-    @available(macOS 11.0, Windows 10, *)
     @Test("Build Pass without OpenSSL")
     func buildWithoutOpenSSL() throws {
         let builder = PassBuilder(

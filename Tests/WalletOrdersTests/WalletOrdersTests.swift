@@ -20,6 +20,7 @@ struct WalletOrdersTests {
         #expect(bundle != nil)
     }
 
+    @available(macOS 11.0, *)
     @Test("Build Order with Encrypted Key")
     func buildEncrypted() throws {
         let builder = OrderBuilder(

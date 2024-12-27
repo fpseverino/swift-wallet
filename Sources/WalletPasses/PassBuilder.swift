@@ -60,7 +60,7 @@ public struct PassBuilder: Sendable {
     public func signature(for manifest: Data) throws -> Data {
         // Swift Crypto doesn't support encrypted PEM private keys, so we have to use OpenSSL for that.
         if let pemPrivateKeyPassword {
-            #if !os(macOS) && !os(Linux) && !os(Windows)
+            #if !os(macOS) && !os(Linux)
                 throw WalletPassesError.noOpenSSLExecutable
             #else
                 guard FileManager.default.fileExists(atPath: self.openSSLURL.path) else {
