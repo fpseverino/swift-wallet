@@ -4,7 +4,17 @@ Create passes for the Apple Wallet app.
 
 ## Overview
 
-This package provides tools to create passes for the Apple Wallet app.
+@Row {
+    @Column { }
+    @Column(size: 4) {
+        ![Passes](passes)
+    }
+    @Column { }
+}
+
+The `WalletPasses` framework provides a set of tools to create and build digital passes for the Apple Wallet app.
+
+For information on Apple Wallet passes, see the [Apple Developer Documentation](https://developer.apple.com/documentation/walletpasses).
 
 ## Topics
 
@@ -15,7 +25,7 @@ This package provides tools to create passes for the Apple Wallet app.
 
 ### Personalized Passes
 
-- ``PersonalizationJSON``
+- <doc:PersonalizablePasses>
 
 ### Errors
 
