@@ -4,9 +4,7 @@ public struct WalletPassesError: Error, Sendable, Equatable {
     public struct ErrorType: Sendable, Hashable, CustomStringConvertible, Equatable {
         enum Base: String, Sendable, Equatable {
             case noSourceFiles
-            case noPassJSONFile
             case noIconFile
-            case noPersonalizationJSONFile
             case noPersonalizationLogoFile
             case noOpenSSLExecutable
             case invalidNumberOfPasses
@@ -20,12 +18,8 @@ public struct WalletPassesError: Error, Sendable, Equatable {
 
         /// The path for the source files is not a directory.
         public static let noSourceFiles = Self(.noSourceFiles)
-        /// The `pass.json` file is missing.
-        public static let noPassJSONFile = Self(.noPassJSONFile)
         /// The `icon@XX.png` file is missing.
         public static let noIconFile = Self(.noIconFile)
-        /// The `personalization.json` file is missing.
-        public static let noPersonalizationJSONFile = Self(.noPersonalizationJSONFile)
         /// The `personalizationLogo@XX.png` file is missing.
         public static let noPersonalizationLogoFile = Self(.noPersonalizationLogoFile)
         /// The `openssl` executable is missing.
@@ -63,14 +57,8 @@ public struct WalletPassesError: Error, Sendable, Equatable {
     /// The path for the source files is not a directory.
     public static let noSourceFiles = Self(errorType: .noSourceFiles)
 
-    /// The `pass.json` file is missing.
-    public static let noPassJSONFile = Self(errorType: .noPassJSONFile)
-
     /// The `icon@XX.png` file is missing.
     public static let noIconFile = Self(errorType: .noIconFile)
-
-    /// The `personalization.json` file is missing.
-    public static let noPersonalizationJSONFile = Self(errorType: .noPersonalizationJSONFile)
 
     /// The `personalizationLogo@XX.png` file is missing.
     public static let noPersonalizationLogoFile = Self(errorType: .noPersonalizationLogoFile)

@@ -39,18 +39,10 @@ public struct OrderBuilder: Sendable {
         var files: [String: Data] = [:]
 
         let paths = try FileManager.default.subpathsOfDirectory(atPath: directory.path)
-
-        guard paths.contains("order.json") else {
-            throw WalletOrdersError.noOrderJSONFile
-        }
-
+        
         for relativePath in paths {
             let file = URL(fileURLWithPath: relativePath, relativeTo: directory)
             guard !file.hasDirectoryPath else {
-                continue
-            }
-
-            guard FileManager.default.fileExists(atPath: file.path) else {
                 continue
             }
 
