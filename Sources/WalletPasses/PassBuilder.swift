@@ -35,21 +35,53 @@ public struct PassBuilder: Sendable {
         self.openSSLURL = URL(fileURLWithPath: openSSLPath)
     }
 
-    private func manifest(for directory: URL) throws -> Data {
-        var manifest: [String: String] = [:]
+    private static func sourceFiles(in directory: URL, isPersonalized: Bool = false) throws -> [String: Data] {
+        var files: [String: Data] = [:]
 
         let paths = try FileManager.default.subpathsOfDirectory(atPath: directory.path)
+
+        if isPersonalized {
+            guard
+                paths.contains("personalizationLogo.png")
+                    || paths.contains("personalizationLogo@1x.png")
+                    || paths.contains("personalizationLogo@2x.png")
+                    || paths.contains("personalizationLogo@3x.png")
+            else {
+                throw WalletPassesError.noPersonalizationLogo
+            }
+        }
+
+        guard
+            paths.contains("icon.png")
+                || paths.contains("icon@1x.png")
+                || paths.contains("icon@2x.png")
+                || paths.contains("icon@3x.png")
+        else {
+            throw WalletPassesError.noIcon
+        }
+
         for relativePath in paths {
             let file = URL(fileURLWithPath: relativePath, relativeTo: directory)
             guard !file.hasDirectoryPath else {
                 continue
             }
 
-            let hash = try Insecure.SHA1.hash(data: Data(contentsOf: file))
-            manifest[relativePath] = hash.map { "0\(String($0, radix: 16))".suffix(2) }.joined()
+            guard !(file.lastPathComponent == ".gitkeep" || file.lastPathComponent == ".DS_Store") else {
+                continue
+            }
+
+            files[relativePath] = try Data(contentsOf: file)
         }
 
-        return try encoder.encode(manifest)
+        return files
+    }
+
+    private func manifest(for sourceFiles: [String: Data]) throws -> Data {
+        let manifest = sourceFiles.mapValues { data in
+            Insecure.SHA1.hash(data: data).map { "0\(String($0, radix: 16))".suffix(2) }.joined()
+        }
+
+        return try self.encoder.encode(manifest)
     }
 
     /// Generates a signature for a given manifest or personalization token.
@@ -99,7 +131,7 @@ public struct PassBuilder: Sendable {
                 ],
                 certificate: Certificate(pemEncoded: self.pemCertificate),
                 privateKey: .init(pemEncoded: self.pemPrivateKey),
-                signingTime: Date()
+                signingTime: Date.now
             )
             return Data(signature)
         }
@@ -129,35 +161,31 @@ public struct PassBuilder: Sendable {
         try FileManager.default.copyItem(at: filesDirectory, to: tempDir)
         defer { try? FileManager.default.removeItem(at: tempDir) }
 
-        var files: [ArchiveFile] = []
+        var archiveFiles: [ArchiveFile] = []
 
         let passJSON = try self.encoder.encode(pass)
         try passJSON.write(to: tempDir.appendingPathComponent("pass.json"))
-        files.append(ArchiveFile(filename: "pass.json", data: passJSON))
+        archiveFiles.append(ArchiveFile(filename: "pass.json", data: passJSON))
 
         // Pass Personalization
         if let personalization {
             let personalizationJSONData = try self.encoder.encode(personalization)
             try personalizationJSONData.write(to: tempDir.appendingPathComponent("personalization.json"))
-            files.append(ArchiveFile(filename: "personalization.json", data: personalizationJSONData))
+            archiveFiles.append(ArchiveFile(filename: "personalization.json", data: personalizationJSONData))
         }
 
-        let manifest = try self.manifest(for: tempDir)
-        files.append(ArchiveFile(filename: "manifest.json", data: manifest))
-        try files.append(ArchiveFile(filename: "signature", data: self.signature(for: manifest)))
+        let sourceFiles = try Self.sourceFiles(in: tempDir, isPersonalized: personalization != nil)
 
-        let paths = try FileManager.default.subpathsOfDirectory(atPath: filesDirectory.path)
-        for relativePath in paths {
-            let file = URL(fileURLWithPath: relativePath, relativeTo: tempDir)
-            guard !file.hasDirectoryPath else {
-                continue
-            }
+        let manifest = try self.manifest(for: sourceFiles)
+        archiveFiles.append(ArchiveFile(filename: "manifest.json", data: manifest))
+        try archiveFiles.append(ArchiveFile(filename: "signature", data: self.signature(for: manifest)))
 
-            try files.append(ArchiveFile(filename: relativePath, data: Data(contentsOf: file)))
+        for file in sourceFiles {
+            archiveFiles.append(ArchiveFile(filename: file.key, data: file.value))
         }
 
         let zipFile = tempDir.appendingPathComponent("\(UUID().uuidString).pkpass")
-        try Zip.zipData(archiveFiles: files, zipFilePath: zipFile)
+        try Zip.zipData(archiveFiles: archiveFiles, zipFilePath: zipFile)
         return try Data(contentsOf: zipFile)
     }
 }

@@ -105,6 +105,47 @@ struct WalletPassesTests {
         }
     }
 
+    @Test("Build Pass without Icon")
+    func buildWithoutIcon() throws {
+        let builder = PassBuilder(
+            pemWWDRCertificate: TestCertificate.pemWWDRCertificate,
+            pemCertificate: TestCertificate.pemCertificate,
+            pemPrivateKey: TestCertificate.pemPrivateKey
+        )
+
+        #expect(throws: WalletPassesError.noIcon) {
+            try builder.build(
+                pass: pass,
+                sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests"
+            )
+        }
+    }
+
+    @Test("Build Personalizable Pass without Personalization Logo")
+    func buildPersonalizedWithoutLogo() throws {
+        let builder = PassBuilder(
+            pemWWDRCertificate: TestCertificate.pemWWDRCertificate,
+            pemCertificate: TestCertificate.pemCertificate,
+            pemPrivateKey: TestCertificate.pemPrivateKey
+        )
+
+        let testPersonalization = PersonalizationJSON(
+            requiredPersonalizationFields: [
+                .name,
+                .emailAddress,
+            ],
+            description: "Test Personalization"
+        )
+
+        #expect(throws: WalletPassesError.noPersonalizationLogo) {
+            try builder.build(
+                pass: pass,
+                sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests",
+                personalization: testPersonalization
+            )
+        }
+    }
+
     private func testRoundTripped(_ bundle: Data, with personalization: PersonalizationJSON? = nil) throws {
         let passURL = FileManager.default.temporaryDirectory.appendingPathComponent("\(UUID().uuidString).pkpass")
         try bundle.write(to: passURL)
