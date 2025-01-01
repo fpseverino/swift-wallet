@@ -39,7 +39,7 @@ public struct OrderBuilder: Sendable {
         var files: [String: Data] = [:]
 
         let paths = try FileManager.default.subpathsOfDirectory(atPath: directory.path)
-        
+
         for relativePath in paths {
             let file = URL(fileURLWithPath: relativePath, relativeTo: directory)
             guard !file.hasDirectoryPath else {

@@ -40,15 +40,6 @@ public struct PassBuilder: Sendable {
 
         let paths = try FileManager.default.subpathsOfDirectory(atPath: directory.path)
 
-        guard
-            paths.contains("icon.png")
-                || paths.contains("icon@1x.png")
-                || paths.contains("icon@2x.png")
-                || paths.contains("icon@3x.png")
-        else {
-            throw WalletPassesError.noIconFile
-        }
-
         if isPersonalized {
             guard
                 paths.contains("personalizationLogo.png")
@@ -56,8 +47,17 @@ public struct PassBuilder: Sendable {
                     || paths.contains("personalizationLogo@2x.png")
                     || paths.contains("personalizationLogo@3x.png")
             else {
-                throw WalletPassesError.noPersonalizationLogoFile
+                throw WalletPassesError.noPersonalizationLogo
             }
+        }
+
+        guard
+            paths.contains("icon.png")
+                || paths.contains("icon@1x.png")
+                || paths.contains("icon@2x.png")
+                || paths.contains("icon@3x.png")
+        else {
+            throw WalletPassesError.noIcon
         }
 
         for relativePath in paths {
