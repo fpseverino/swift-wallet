@@ -13,6 +13,9 @@ public struct OrderBuilder: Sendable {
 
     private let encoder = JSONEncoder()
 
+    private static let manifestFileName = "manifest.json"
+    private static let signatureFileName = "signature"
+
     /// Creates a new ``OrderBuilder``.
     ///
     /// - Parameters:
@@ -75,7 +78,7 @@ public struct OrderBuilder: Sendable {
             try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
             defer { try? FileManager.default.removeItem(at: dir) }
 
-            try manifest.write(to: dir.appendingPathComponent("manifest.json"))
+            try manifest.write(to: dir.appendingPathComponent(Self.manifestFileName))
             try self.pemWWDRCertificate.write(to: dir.appendingPathComponent("wwdr.pem"), atomically: true, encoding: .utf8)
             try self.pemCertificate.write(to: dir.appendingPathComponent("certificate.pem"), atomically: true, encoding: .utf8)
             try self.pemPrivateKey.write(to: dir.appendingPathComponent("private.pem"), atomically: true, encoding: .utf8)
@@ -88,15 +91,15 @@ public struct OrderBuilder: Sendable {
                 "-certfile", dir.appendingPathComponent("wwdr.pem").path,
                 "-signer", dir.appendingPathComponent("certificate.pem").path,
                 "-inkey", dir.appendingPathComponent("private.pem").path,
-                "-in", dir.appendingPathComponent("manifest.json").path,
-                "-out", dir.appendingPathComponent("signature").path,
+                "-in", dir.appendingPathComponent(Self.manifestFileName).path,
+                "-out", dir.appendingPathComponent(Self.signatureFileName).path,
                 "-outform", "DER",
                 "-passin", "pass:\(pemPrivateKeyPassword)",
             ]
             try process.run()
             process.waitUntilExit()
 
-            return try Data(contentsOf: dir.appendingPathComponent("signature"))
+            return try Data(contentsOf: dir.appendingPathComponent(Self.signatureFileName))
         } else {
             let signature = try CMS.sign(
                 manifest,
@@ -143,8 +146,8 @@ public struct OrderBuilder: Sendable {
         let sourceFiles = try Self.sourceFiles(in: tempDir)
 
         let manifest = try self.manifest(for: sourceFiles)
-        archiveFiles.append(ArchiveFile(filename: "manifest.json", data: manifest))
-        try archiveFiles.append(ArchiveFile(filename: "signature", data: self.signature(for: manifest)))
+        archiveFiles.append(ArchiveFile(filename: Self.manifestFileName, data: manifest))
+        try archiveFiles.append(ArchiveFile(filename: Self.signatureFileName, data: self.signature(for: manifest)))
 
         for file in sourceFiles {
             archiveFiles.append(ArchiveFile(filename: file.key, data: file.value))
