@@ -103,28 +103,34 @@ public struct PassBuilder: Sendable {
             try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
             defer { try? FileManager.default.removeItem(at: dir) }
 
-            try manifest.write(to: dir.appendingPathComponent(Self.manifestFileName))
-            try self.pemWWDRCertificate.write(to: dir.appendingPathComponent("wwdr.pem"), atomically: true, encoding: .utf8)
-            try self.pemCertificate.write(to: dir.appendingPathComponent("certificate.pem"), atomically: true, encoding: .utf8)
-            try self.pemPrivateKey.write(to: dir.appendingPathComponent("private.pem"), atomically: true, encoding: .utf8)
+            let manifestURL = dir.appendingPathComponent(Self.manifestFileName)
+            let wwdrURL = dir.appendingPathComponent("wwdr.pem")
+            let certificateURL = dir.appendingPathComponent("certificate.pem")
+            let privateKeyURL = dir.appendingPathComponent("private.pem")
+            let signatureURL = dir.appendingPathComponent(Self.signatureFileName)
+
+            try manifest.write(to: manifestURL)
+            try self.pemWWDRCertificate.write(to: wwdrURL, atomically: true, encoding: .utf8)
+            try self.pemCertificate.write(to: certificateURL, atomically: true, encoding: .utf8)
+            try self.pemPrivateKey.write(to: privateKeyURL, atomically: true, encoding: .utf8)
 
             let process = Process()
             process.currentDirectoryURL = dir
             process.executableURL = self.openSSLURL
             process.arguments = [
                 "smime", "-binary", "-sign",
-                "-certfile", dir.appendingPathComponent("wwdr.pem").path,
-                "-signer", dir.appendingPathComponent("certificate.pem").path,
-                "-inkey", dir.appendingPathComponent("private.pem").path,
-                "-in", dir.appendingPathComponent(Self.manifestFileName).path,
-                "-out", dir.appendingPathComponent(Self.signatureFileName).path,
+                "-certfile", wwdrURL.path,
+                "-signer", certificateURL.path,
+                "-inkey", privateKeyURL.path,
+                "-in", manifestURL.path,
+                "-out", signatureURL.path,
                 "-outform", "DER",
                 "-passin", "pass:\(pemPrivateKeyPassword)",
             ]
             try process.run()
             process.waitUntilExit()
 
-            return try Data(contentsOf: dir.appendingPathComponent(Self.signatureFileName))
+            return try Data(contentsOf: signatureURL)
         } else {
             let signature = try CMS.sign(
                 manifest,
