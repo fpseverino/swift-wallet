@@ -3,7 +3,7 @@ public enum OrderJSON {
     /// A protocol that defines the structure of a `order.json` file.
     ///
     /// > Tip: See the [`Order`](https://developer.apple.com/documentation/walletorders/order) object to understand the keys.
-    public protocol Properties: Codable {
+    public protocol Properties: Codable, Sendable {
         /// The date and time when the customer created the order, in RFC 3339 format.
         var createdAt: String { get }
 
@@ -48,7 +48,7 @@ extension OrderJSON {
     /// A protocol that represents the merchant associated with the order.
     ///
     /// > Tip: See the [`Order.Merchant`](https://developer.apple.com/documentation/walletorders/merchant) object to understand the keys.
-    public protocol Merchant: Codable {
+    public protocol Merchant: Codable, Sendable {
         /// The localized display name of the merchant.
         var displayName: String { get }
 
@@ -64,7 +64,7 @@ extension OrderJSON {
     /// A protocol that represents the details of a barcode for an order.
     ///
     /// > Tip: See the [`Order.Barcode`](https://developer.apple.com/documentation/walletorders/barcode) object to understand the keys.
-    public protocol Barcode: Codable {
+    public protocol Barcode: Codable, Sendable {
         /// The format of the barcode.
         var format: BarcodeFormat { get }
 
@@ -80,24 +80,24 @@ extension OrderJSON {
 
 extension OrderJSON {
     /// The type of order this bundle represents.
-    public enum OrderType: String, Codable {
+    public enum OrderType: String, Codable, Sendable {
         case ecommerce
     }
 
     /// A high-level status of the order, used for display purposes.
-    public enum OrderStatus: String, Codable {
+    public enum OrderStatus: String, Codable, Sendable {
         case completed
         case cancelled
         case open
     }
 
     /// The version of the schema used for the order.
-    public enum SchemaVersion: Int, Codable {
+    public enum SchemaVersion: Int, Codable, Sendable {
         case v1 = 1
     }
 
     /// The format of the barcode.
-    public enum BarcodeFormat: String, Codable {
+    public enum BarcodeFormat: String, Codable, Sendable {
         case pdf417
         case qr
         case aztec

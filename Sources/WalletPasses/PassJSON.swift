@@ -3,7 +3,7 @@ public enum PassJSON {
     /// A protocol that defines the structure of a `pass.json` file.
     ///
     /// > Tip: See the [`Pass`](https://developer.apple.com/documentation/walletpasses/pass) object to understand the keys.
-    public protocol Properties: Codable {
+    public protocol Properties: Codable, Sendable {
         /// A short description that iOS accessibility technologies use for a pass.
         var description: String { get }
 
@@ -34,7 +34,7 @@ extension PassJSON {
     /// A protocol that represents the information to display in a field on a pass.
     ///
     /// > Tip: See the [`PassFieldContent`](https://developer.apple.com/documentation/walletpasses/passfieldcontent) object to understand the keys.
-    public protocol PassFieldContent: Codable {
+    public protocol PassFieldContent: Codable, Sendable {
         /// A unique key that identifies a field in the pass; for example, `departure-gate`.
         var key: String { get }
 
@@ -49,7 +49,7 @@ extension PassJSON {
     /// A protocol that represents the groups of fields that display the information for a boarding pass.
     ///
     /// > Tip: See the [`Pass.BoardingPass`](https://developer.apple.com/documentation/walletpasses/pass/boardingpass) object to understand the keys.
-    public protocol BoardingPass: Codable {
+    public protocol BoardingPass: Codable, Sendable {
         /// The type of transit for a boarding pass.
         ///
         /// This key is invalid for other types of passes.
@@ -64,7 +64,7 @@ extension PassJSON {
     /// A protocol that represents a barcode on a pass.
     ///
     /// > Tip: See the [`Pass.Barcodes`](https://developer.apple.com/documentation/walletpasses/pass/barcodes) object to understand the keys.
-    public protocol Barcodes: Codable {
+    public protocol Barcodes: Codable, Sendable {
         /// The format of the barcode.
         ///
         /// The barcode format `PKBarcodeFormatCode128` isn’t supported for watchOS.
@@ -83,7 +83,7 @@ extension PassJSON {
     /// A protocol that represents a location that the system uses to show a relevant pass.
     ///
     /// > Tip: See the [`Pass.Locations`](https://developer.apple.com/documentation/walletpasses/pass/locations) object to understand the keys.
-    public protocol Locations: Codable {
+    public protocol Locations: Codable, Sendable {
         /// The latitude, in degrees, of the location.
         var latitude: Double { get }
 
@@ -96,7 +96,7 @@ extension PassJSON {
     /// An object that represents the near-field communication (NFC) payload the device passes to an Apple Pay terminal.
     ///
     /// > Tip: See the [`Pass.NFC`](https://developer.apple.com/documentation/walletpasses/pass/nfc) object to understand the keys.
-    public protocol NFC: Codable {
+    public protocol NFC: Codable, Sendable {
         /// The payload the device transmits to the Apple Pay terminal.
         ///
         /// The size must be no more than 64 bytes.
@@ -112,13 +112,13 @@ extension PassJSON {
 
 extension PassJSON {
     /// The version of the file format.
-    public enum FormatVersion: Int, Codable {
+    public enum FormatVersion: Int, Codable, Sendable {
         /// The value must be `1`.
         case v1 = 1
     }
 
     /// The type of transit for a boarding pass.
-    public enum TransitType: String, Codable {
+    public enum TransitType: String, Codable, Sendable {
         case air = "PKTransitTypeAir"
         case boat = "PKTransitTypeBoat"
         case bus = "PKTransitTypeBus"
@@ -127,7 +127,7 @@ extension PassJSON {
     }
 
     /// The format of the barcode.
-    public enum BarcodeFormat: String, Codable {
+    public enum BarcodeFormat: String, Codable, Sendable {
         case pdf417 = "PKBarcodeFormatPDF417"
         case qr = "PKBarcodeFormatQR"
         case aztec = "PKBarcodeFormatAztec"
