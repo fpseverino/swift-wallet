@@ -46,7 +46,7 @@ struct WalletOrdersTests {
         try testRoundTripped(bundle)
     }
 
-    @Test("Build Pass without Source Files")
+    @Test("Build Order without Source Files")
     func buildWithoutSourceFiles() throws {
         let builder = OrderBuilder(
             pemWWDRCertificate: TestCertificate.pemWWDRCertificate,
@@ -62,7 +62,7 @@ struct WalletOrdersTests {
         }
     }
 
-    @Test("Build Pass without OpenSSL")
+    @Test("Build Order without OpenSSL")
     func buildWithoutOpenSSL() throws {
         let builder = OrderBuilder(
             pemWWDRCertificate: TestCertificate.pemWWDRCertificate,
