@@ -3,7 +3,7 @@ import Foundation
 @_spi(CMS) import X509
 import Zip
 
-/// A builder for generating order content bundles.
+/// A tool that generates pass content bundles.
 public struct OrderBuilder: Sendable {
     private let pemWWDRCertificate: String
     private let pemCertificate: String
@@ -17,6 +17,8 @@ public struct OrderBuilder: Sendable {
     private static let signatureFileName = "signature"
 
     /// Creates a new ``OrderBuilder``.
+    ///
+    /// > Tip: Obtaining the three certificates files could be a bit tricky. You could get some guidance from [this guide](https://github.com/alexandercerutti/passkit-generator/wiki/Generating-Certificates) and [this video](https://www.youtube.com/watch?v=rJZdPoXHtzI). Those guides are for Wallet passes, but the process is similar for Wallet orders.
     ///
     /// - Parameters:
     ///   - pemWWDRCertificate: Apple's WWDR.pem certificate in PEM format.

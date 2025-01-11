@@ -6,7 +6,7 @@ Create and sign personalized passes for the Apple Wallet app.
 
 > Warning: This section is a work in progress. Testing is hard without access to the certificates required to develop this feature. If you have access to the entitlements, please help us implement this feature.
 
-Pass Personalization lets you create passes, referred to as personalizable passes, that prompt the user to provide personal information during signup that will be sent to your server.
+Pass Personalization lets you create passes, referred to as personalizable passes, that prompt the user to provide personal information during signup that will be sent to your server and used to update the pass.
 
 > Important: Making a pass personalizable, just like adding NFC to a pass, requires a special entitlement issued by Apple. Although accessing such entitlements is hard if you're not a big company, you can learn more in [Getting Started with Apple Wallet](https://developer.apple.com/wallet/get-started/).
 
@@ -24,8 +24,12 @@ A personalizable pass is just a standard pass package with the following additio
 To make a pass personalizable, you need to pass a ``PersonalizationJSON`` object to ``PassBuilder/build(pass:sourceFilesDirectoryPath:personalization:)``, and the source files directory must contain the `personalizationLogo@XX.png` file.
 
 Once you've built the pass, you can distribute it like any other pass.
+
 The user will be prompted to provide the required personal information when they add the pass.
-Wallet will then send the user personal information to your server.
+
+Wallet will then send the user personal information to your server to be stored and used to update the pass, along with a personalization token that you have to sign and return to Wallet in the response.
+You can use the ``PassBuilder/signature(for:)`` to sign the personalization token.
+
 Immediately after that, the Wallet app will request the updated pass.
 
 > Important: The updated and personalized pass **must not** contain the `personalization.json` file.
@@ -33,3 +37,4 @@ Immediately after that, the Wallet app will request the updated pass.
 ## Topics
 
 - ``PersonalizationJSON``
+- ``PassBuilder/signature(for:)``

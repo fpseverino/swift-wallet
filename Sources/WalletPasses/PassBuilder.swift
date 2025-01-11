@@ -3,7 +3,7 @@ import Foundation
 @_spi(CMS) import X509
 import Zip
 
-/// A builder for generating pass content bundles.
+/// A tool that generates pass content bundles.
 public struct PassBuilder: Sendable {
     private let pemWWDRCertificate: String
     private let pemCertificate: String
@@ -17,6 +17,8 @@ public struct PassBuilder: Sendable {
     private static let signatureFileName = "signature"
 
     /// Creates a new ``PassBuilder``.
+    ///
+    /// > Tip: Obtaining the three certificates files could be a bit tricky. You could get some guidance from [this guide](https://github.com/alexandercerutti/passkit-generator/wiki/Generating-Certificates) and [this video](https://www.youtube.com/watch?v=rJZdPoXHtzI).
     ///
     /// - Parameters:
     ///   - pemWWDRCertificate: Apple's WWDR.pem certificate in PEM format.
@@ -39,6 +41,8 @@ public struct PassBuilder: Sendable {
     }
 
     /// Generates a signature for a given personalization token.
+    ///
+    /// See <doc:PersonalizablePasses> for more information.
     ///
     /// - Parameter data: The personalization token data to sign.
     ///
@@ -102,7 +106,7 @@ public struct PassBuilder: Sendable {
     /// - Parameters:
     ///   - pass: The pass to generate the content for.
     ///   - sourceFilesDirectoryPath: The path to the source files directory.
-    ///   - personalization: The personalization information for the pass.
+    ///   - personalization: The personalization information for the pass. See <doc:PersonalizablePasses> for more information.
     ///
     /// - Returns: The generated pass content as `Data`.
     public func build(
