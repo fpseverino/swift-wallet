@@ -3,7 +3,7 @@ public enum OrderJSON {
     /// A protocol that defines the structure of a `order.json` file.
     ///
     /// > Tip: See the [`Order`](https://developer.apple.com/documentation/walletorders/order) object to understand the keys.
-    public protocol Properties: Codable, Sendable {
+    public protocol Properties: Encodable, Sendable {
         /// The date and time when the customer created the order, in RFC 3339 format.
         var createdAt: String { get }
 
@@ -48,7 +48,7 @@ extension OrderJSON {
     /// A protocol that represents the merchant associated with the order.
     ///
     /// > Tip: See the [`Order.Merchant`](https://developer.apple.com/documentation/walletorders/merchant) object to understand the keys.
-    public protocol Merchant: Codable, Sendable {
+    public protocol Merchant: Encodable, Sendable {
         /// The localized display name of the merchant.
         var displayName: String { get }
 
@@ -64,7 +64,7 @@ extension OrderJSON {
     /// A protocol that represents the details of a barcode for an order.
     ///
     /// > Tip: See the [`Order.Barcode`](https://developer.apple.com/documentation/walletorders/barcode) object to understand the keys.
-    public protocol Barcode: Codable, Sendable {
+    public protocol Barcode: Encodable, Sendable {
         /// The format of the barcode.
         var format: BarcodeFormat { get }
 

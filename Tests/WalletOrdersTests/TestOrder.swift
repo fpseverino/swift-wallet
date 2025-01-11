@@ -1,7 +1,7 @@
 import Foundation
 import WalletOrders
 
-struct TestOrder: OrderJSON.Properties {
+struct TestOrder: OrderJSON.Properties, Decodable {
     var schemaVersion = OrderJSON.SchemaVersion.v1
     var orderTypeIdentifier = "order.com.example.swift-wallet"
     var orderIdentifier = UUID().uuidString
@@ -15,7 +15,7 @@ struct TestOrder: OrderJSON.Properties {
     var authenticationToken = UUID().uuidString
     var webServiceURL = "https://www.example.com/api/orders/"
 
-    struct MerchantData: OrderJSON.Merchant {
+    struct MerchantData: OrderJSON.Merchant, Decodable {
         var merchantIdentifier = "com.example.pet-store"
         var displayName = "Pet Store"
         var url = "https://www.example.com/"

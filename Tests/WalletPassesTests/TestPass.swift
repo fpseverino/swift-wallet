@@ -1,7 +1,7 @@
 import Foundation
 import WalletPasses
 
-struct TestPass: PassJSON.Properties {
+struct TestPass: PassJSON.Properties, Decodable {
     var description = "Test Pass"
     var formatVersion = PassJSON.FormatVersion.v1
     var organizationName = "example"
@@ -15,15 +15,15 @@ struct TestPass: PassJSON.Properties {
     var backgroundColor = "rgb(207, 77, 243)"
     var foregroundColor = "rgb(255, 255, 255)"
 
-    var barcodes = Barcode(message: "test")
-    struct Barcode: PassJSON.Barcodes {
+    var barcodes = [Barcode(message: "test")]
+    struct Barcode: PassJSON.Barcodes, Decodable {
         var format = PassJSON.BarcodeFormat.qr
         var message: String
         var messageEncoding = "iso-8859-1"
     }
 
     var boardingPass = Boarding(transitType: .air)
-    struct Boarding: PassJSON.BoardingPass {
+    struct Boarding: PassJSON.BoardingPass, Decodable {
         let transitType: PassJSON.TransitType
         let headerFields: [PassField]
         let primaryFields: [PassField]
@@ -31,7 +31,7 @@ struct TestPass: PassJSON.Properties {
         let auxiliaryFields: [PassField]
         let backFields: [PassField]
 
-        struct PassField: PassJSON.PassFieldContent {
+        struct PassField: PassJSON.PassFieldContent, Decodable {
             let key: String
             let label: String
             let value: String
