@@ -20,6 +20,7 @@ For information on Apple Wallet passes, see the [Apple Developer Documentation](
 
 ### Essentials
 
+- <doc:Certificates>
 - ``PassBuilder``
 - ``PassJSON``
 

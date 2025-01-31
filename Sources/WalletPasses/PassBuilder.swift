@@ -18,7 +18,7 @@ public struct PassBuilder: Sendable {
 
     /// Creates a new ``PassBuilder``.
     ///
-    /// > Tip: Obtaining the three certificates files could be a bit tricky. You could get some guidance from [this guide](https://github.com/alexandercerutti/passkit-generator/wiki/Generating-Certificates) and [this video](https://www.youtube.com/watch?v=rJZdPoXHtzI).
+    /// > Tip: Obtaining the three certificates files could be a bit tricky. See <doc:Certificates> to get some guidance.
     ///
     /// - Parameters:
     ///   - pemWWDRCertificate: Apple's WWDR.pem certificate in PEM format.

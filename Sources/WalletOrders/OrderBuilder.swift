@@ -18,7 +18,7 @@ public struct OrderBuilder: Sendable {
 
     /// Creates a new ``OrderBuilder``.
     ///
-    /// > Tip: Obtaining the three certificates files could be a bit tricky. You could get some guidance from [this guide](https://github.com/alexandercerutti/passkit-generator/wiki/Generating-Certificates) and [this video](https://www.youtube.com/watch?v=rJZdPoXHtzI). Those guides are for Wallet passes, but the process is similar for Wallet orders.
+    /// > Tip: Obtaining the three certificates files could be a bit tricky. See <doc:Certificates> to get some guidance.
     ///
     /// - Parameters:
     ///   - pemWWDRCertificate: Apple's WWDR.pem certificate in PEM format.

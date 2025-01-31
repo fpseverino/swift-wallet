@@ -12,6 +12,7 @@ For information on Apple Wallet orders, see the [Apple Developer Documentation](
 
 ### Essentials
 
+- <doc:Certificates>
 - ``OrderBuilder``
 - ``OrderJSON``
 
