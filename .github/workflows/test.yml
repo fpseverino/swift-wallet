@@ -35,6 +35,9 @@ jobs:
           cmake ..
           cmake --build . --config Release
           cmake --install . --prefix ../install
+      - name: Install OpenSSL
+        run: |
+          choco install openssl
       - name: Check out code
         uses: actions/checkout@v4
       - name: Run unit tests
