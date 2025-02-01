@@ -9,19 +9,12 @@ struct WalletPassesTests {
     let decoder = JSONDecoder()
     let pass = TestPass()
 
-    #if os(Windows)
-        let openSSLPath = #"C:\ProgramData\chocolatey\lib\openssl"#
-    #else
-        let openSSLPath: String = "/usr/bin/openssl"
-    #endif
-
     @Test("Build Pass")
     func build() throws {
         let builder = PassBuilder(
             pemWWDRCertificate: TestCertificate.pemWWDRCertificate,
             pemCertificate: TestCertificate.pemCertificate,
-            pemPrivateKey: TestCertificate.pemPrivateKey,
-            openSSLPath: openSSLPath
+            pemPrivateKey: TestCertificate.pemPrivateKey
         )
 
         let bundle = try builder.build(
@@ -38,8 +31,7 @@ struct WalletPassesTests {
             pemWWDRCertificate: TestCertificate.pemWWDRCertificate,
             pemCertificate: TestCertificate.encryptedPemCertificate,
             pemPrivateKey: TestCertificate.encryptedPemPrivateKey,
-            pemPrivateKeyPassword: "password",
-            openSSLPath: openSSLPath
+            pemPrivateKeyPassword: "password"
         )
 
         let bundle = try builder.build(
@@ -55,8 +47,7 @@ struct WalletPassesTests {
         let builder = PassBuilder(
             pemWWDRCertificate: TestCertificate.pemWWDRCertificate,
             pemCertificate: TestCertificate.pemCertificate,
-            pemPrivateKey: TestCertificate.pemPrivateKey,
-            openSSLPath: openSSLPath
+            pemPrivateKey: TestCertificate.pemPrivateKey
         )
 
         let testPersonalization = PersonalizationJSON(
@@ -81,8 +72,7 @@ struct WalletPassesTests {
         let builder = PassBuilder(
             pemWWDRCertificate: TestCertificate.pemWWDRCertificate,
             pemCertificate: TestCertificate.pemCertificate,
-            pemPrivateKey: TestCertificate.pemPrivateKey,
-            openSSLPath: openSSLPath
+            pemPrivateKey: TestCertificate.pemPrivateKey
         )
 
         #expect(throws: WalletPassesError.noSourceFiles) {
@@ -116,8 +106,7 @@ struct WalletPassesTests {
         let builder = PassBuilder(
             pemWWDRCertificate: TestCertificate.pemWWDRCertificate,
             pemCertificate: TestCertificate.pemCertificate,
-            pemPrivateKey: TestCertificate.pemPrivateKey,
-            openSSLPath: openSSLPath
+            pemPrivateKey: TestCertificate.pemPrivateKey
         )
 
         #expect(throws: WalletPassesError.noIcon) {
@@ -133,8 +122,7 @@ struct WalletPassesTests {
         let builder = PassBuilder(
             pemWWDRCertificate: TestCertificate.pemWWDRCertificate,
             pemCertificate: TestCertificate.pemCertificate,
-            pemPrivateKey: TestCertificate.pemPrivateKey,
-            openSSLPath: openSSLPath
+            pemPrivateKey: TestCertificate.pemPrivateKey
         )
 
         let testPersonalization = PersonalizationJSON(

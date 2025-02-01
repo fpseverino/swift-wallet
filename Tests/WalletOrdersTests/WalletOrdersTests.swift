@@ -9,19 +9,12 @@ struct WalletOrdersTests {
     let decoder = JSONDecoder()
     let order = TestOrder()
 
-    #if os(Windows)
-        let openSSLPath = #"C:\ProgramData\chocolatey\lib\openssl"#
-    #else
-        let openSSLPath: String = "/usr/bin/openssl"
-    #endif
-
     @Test("Build Order")
     func build() throws {
         let builder = OrderBuilder(
             pemWWDRCertificate: TestCertificate.pemWWDRCertificate,
             pemCertificate: TestCertificate.pemCertificate,
-            pemPrivateKey: TestCertificate.pemPrivateKey,
-            openSSLPath: openSSLPath
+            pemPrivateKey: TestCertificate.pemPrivateKey
         )
 
         let bundle = try builder.build(
@@ -38,8 +31,7 @@ struct WalletOrdersTests {
             pemWWDRCertificate: TestCertificate.pemWWDRCertificate,
             pemCertificate: TestCertificate.encryptedPemCertificate,
             pemPrivateKey: TestCertificate.encryptedPemPrivateKey,
-            pemPrivateKeyPassword: "password",
-            openSSLPath: openSSLPath
+            pemPrivateKeyPassword: "password"
         )
 
         let bundle = try builder.build(
@@ -55,8 +47,7 @@ struct WalletOrdersTests {
         let builder = OrderBuilder(
             pemWWDRCertificate: TestCertificate.pemWWDRCertificate,
             pemCertificate: TestCertificate.pemCertificate,
-            pemPrivateKey: TestCertificate.pemPrivateKey,
-            openSSLPath: openSSLPath
+            pemPrivateKey: TestCertificate.pemPrivateKey
         )
 
         #expect(throws: WalletOrdersError.noSourceFiles) {
