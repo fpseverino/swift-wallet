@@ -1,7 +1,7 @@
 import Crypto
 import Foundation
 @_spi(CMS) import X509
-import Zip
+import ZipArchive
 
 /// A tool that generates pass content bundles.
 public struct PassBuilder: Sendable {
@@ -125,17 +125,17 @@ public struct PassBuilder: Sendable {
         try FileManager.default.copyItem(at: filesDirectory, to: tempDir)
         defer { try? FileManager.default.removeItem(at: tempDir) }
 
-        var archiveFiles: [ArchiveFile] = []
+        var archiveFiles: [String: Data] = [:]
 
         let passJSON = try self.encoder.encode(pass)
         try passJSON.write(to: tempDir.appendingPathComponent("pass.json"))
-        archiveFiles.append(ArchiveFile(filename: "pass.json", data: passJSON))
+        archiveFiles["pass.json"] = passJSON
 
         // Pass Personalization
         if let personalization {
             let personalizationJSONData = try self.encoder.encode(personalization)
             try personalizationJSONData.write(to: tempDir.appendingPathComponent("personalization.json"))
-            archiveFiles.append(ArchiveFile(filename: "personalization.json", data: personalizationJSONData))
+            archiveFiles["personalization.json"] = personalizationJSONData
         }
 
         let sourceFilesPaths = try FileManager.default.subpathsOfDirectory(atPath: tempDir.path)
@@ -175,17 +175,19 @@ public struct PassBuilder: Sendable {
 
             let fileData = try Data(contentsOf: fileURL)
 
-            archiveFiles.append(ArchiveFile(filename: relativePath, data: fileData))
+            archiveFiles[relativePath] = fileData
 
             manifestJSON[relativePath] = Insecure.SHA1.hash(data: fileData).map { "0\(String($0, radix: 16))".suffix(2) }.joined()
         }
 
         let manifestData = try self.encoder.encode(manifestJSON)
-        archiveFiles.append(ArchiveFile(filename: Self.manifestFileName, data: manifestData))
-        try archiveFiles.append(ArchiveFile(filename: Self.signatureFileName, data: self.signature(for: manifestData)))
+        archiveFiles[Self.manifestFileName] = manifestData
+        try archiveFiles[Self.signatureFileName] = self.signature(for: manifestData)
 
-        let zipFile = tempDir.appendingPathComponent("\(UUID().uuidString).pkpass")
-        try Zip.zipData(archiveFiles: archiveFiles, zipFilePath: zipFile)
-        return try Data(contentsOf: zipFile)
+        let writer = ZipArchiveWriter()
+        for (filename, contents) in archiveFiles {
+            try writer.writeFile(filename: filename, contents: Array(contents))
+        }
+        return try Data(writer.finalizeBuffer())
     }
 }
