@@ -14,3 +14,29 @@ jobs:
       with_musl: true
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: compnerd/gha-setup-swift@main
+        with:
+          branch: swift-6.0-release
+          tag: 6.0-RELEASE
+      - name: Download zlib
+        run: |
+          curl -L -o zlib.zip https://www.zlib.net/zlib131.zip
+          mkdir zlib-131
+          tar -xf zlib.zip -C zlib-131 --strip-components=1
+      - name: Build and install zlib
+        run: |
+          cd zlib-131
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build . --config Release
+          cmake --install . --prefix ../install
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Run unit tests
+        run: |
+          swift test -Xcc -I'C:/Program Files (x86)/zlib/include' -Xlinker -L'C:/Program Files (x86)/zlib/lib'
