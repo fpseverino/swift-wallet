@@ -10,7 +10,7 @@ struct WalletOrdersTests {
     let order = TestOrder()
 
     #if os(Windows)
-        let openSSLPath = #"C:\Program Files (x86)\Git\usr\bin\openssl.exe"#
+        let openSSLPath = #"C:\Program Files\Git\usr\bin\openssl.exe"#
     #else
         let openSSLPath: String = "/usr/bin/openssl"
     #endif
