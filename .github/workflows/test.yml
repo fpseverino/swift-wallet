@@ -15,7 +15,7 @@ jobs:
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  windows:
+  windows-unit:
     runs-on: windows-latest
     steps:
       - uses: compnerd/gha-setup-swift@main
