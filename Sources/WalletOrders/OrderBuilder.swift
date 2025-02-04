@@ -1,9 +1,16 @@
 import Crypto
-import Foundation
 @_spi(CMS) import X509
 import ZipArchive
 
-/// A tool that generates pass content bundles.
+#if canImport(FoundationEssentials)
+    import FoundationEssentials
+#else
+    import Foundation
+#endif
+
+/// A tool that generates order content bundles.
+///
+/// > Warning: You can only sign orders with the same order type identifier of the certificates used to initialize the ``OrderBuilder``.
 public struct OrderBuilder: Sendable {
     private let pemWWDRCertificate: String
     private let pemCertificate: String
@@ -106,42 +113,26 @@ public struct OrderBuilder: Sendable {
         sourceFilesDirectoryPath: String
     ) throws -> Data {
         let filesDirectory = URL(filePath: sourceFilesDirectoryPath, directoryHint: .isDirectory)
-        guard
-            (try? filesDirectory.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
-        else {
+        guard (try? filesDirectory.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false else {
             throw WalletOrdersError.noSourceFiles
         }
 
-        let tempDir = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString, directoryHint: .isDirectory)
-        try FileManager.default.copyItem(at: filesDirectory, to: tempDir)
-        defer { try? FileManager.default.removeItem(at: tempDir) }
-
         var archiveFiles: [String: Data] = [:]
-
-        let orderJSON = try self.encoder.encode(order)
-        try orderJSON.write(to: tempDir.appending(path: "order.json"))
-        archiveFiles["order.json"] = orderJSON
-
-        let sourceFilesPaths = try FileManager.default.subpathsOfDirectory(atPath: tempDir.path())
-
         var manifestJSON: [String: String] = [:]
 
+        let orderJSON = try self.encoder.encode(order)
+        archiveFiles["order.json"] = orderJSON
+        manifestJSON["order.json"] = orderJSON.manifestHash
+
+        let sourceFilesPaths = try FileManager.default.subpathsOfDirectory(atPath: filesDirectory.path())
         for relativePath in sourceFilesPaths {
-            let fileURL = URL(filePath: relativePath, relativeTo: tempDir)
-
-            guard !fileURL.hasDirectoryPath else {
-                continue
-            }
-
-            guard !(fileURL.lastPathComponent == ".gitkeep" || fileURL.lastPathComponent == ".DS_Store") else {
-                continue
-            }
+            let fileURL = URL(filePath: relativePath, directoryHint: .checkFileSystem, relativeTo: filesDirectory)
+            guard !fileURL.hasDirectoryPath else { continue }
+            if fileURL.lastPathComponent == ".gitkeep" || fileURL.lastPathComponent == ".DS_Store" { continue }
 
             let fileData = try Data(contentsOf: fileURL)
-
             archiveFiles[relativePath] = fileData
-
-            manifestJSON[relativePath] = SHA256.hash(data: fileData).map { "0\(String($0, radix: 16))".suffix(2) }.joined()
+            manifestJSON[relativePath] = fileData.manifestHash
         }
 
         let manifestData = try self.encoder.encode(manifestJSON)
@@ -153,5 +144,11 @@ public struct OrderBuilder: Sendable {
             try writer.writeFile(filename: filename, contents: Array(contents))
         }
         return try Data(writer.finalizeBuffer())
+    }
+}
+
+extension Data {
+    fileprivate var manifestHash: String {
+        SHA256.hash(data: self).map { "0\(String($0, radix: 16))".suffix(2) }.joined()
     }
 }
