@@ -37,25 +37,25 @@ public struct OrderBuilder: Sendable {
         self.pemCertificate = pemCertificate
         self.pemPrivateKey = pemPrivateKey
         self.pemPrivateKeyPassword = pemPrivateKeyPassword
-        self.openSSLURL = URL(fileURLWithPath: openSSLPath)
+        self.openSSLURL = URL(filePath: openSSLPath)
     }
 
     private func signature(for manifest: Data) throws -> Data {
         // Swift Crypto doesn't support encrypted PEM private keys, so we have to use OpenSSL for that.
         if let pemPrivateKeyPassword {
-            guard FileManager.default.fileExists(atPath: self.openSSLURL.path) else {
+            guard FileManager.default.fileExists(atPath: self.openSSLURL.path()) else {
                 throw WalletOrdersError.noOpenSSLExecutable
             }
 
-            let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+            let tempDir = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString, directoryHint: .isDirectory)
             try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
             defer { try? FileManager.default.removeItem(at: tempDir) }
 
-            let manifestURL = tempDir.appendingPathComponent(Self.manifestFileName)
-            let wwdrURL = tempDir.appendingPathComponent("wwdr.pem")
-            let certificateURL = tempDir.appendingPathComponent("certificate.pem")
-            let privateKeyURL = tempDir.appendingPathComponent("private.pem")
-            let signatureURL = tempDir.appendingPathComponent(Self.signatureFileName)
+            let manifestURL = tempDir.appending(path: Self.manifestFileName)
+            let wwdrURL = tempDir.appending(path: "wwdr.pem")
+            let certificateURL = tempDir.appending(path: "certificate.pem")
+            let privateKeyURL = tempDir.appending(path: "private.pem")
+            let signatureURL = tempDir.appending(path: Self.signatureFileName)
 
             try manifest.write(to: manifestURL)
             try self.pemWWDRCertificate.write(to: wwdrURL, atomically: true, encoding: .utf8)
@@ -67,11 +67,11 @@ public struct OrderBuilder: Sendable {
             process.executableURL = self.openSSLURL
             process.arguments = [
                 "smime", "-binary", "-sign",
-                "-certfile", wwdrURL.path,
-                "-signer", certificateURL.path,
-                "-inkey", privateKeyURL.path,
-                "-in", manifestURL.path,
-                "-out", signatureURL.path,
+                "-certfile", wwdrURL.path(),
+                "-signer", certificateURL.path(),
+                "-inkey", privateKeyURL.path(),
+                "-in", manifestURL.path(),
+                "-out", signatureURL.path(),
                 "-outform", "DER",
                 "-passin", "pass:\(pemPrivateKeyPassword)",
             ]
@@ -105,29 +105,29 @@ public struct OrderBuilder: Sendable {
         order: some OrderJSON.Properties,
         sourceFilesDirectoryPath: String
     ) throws -> Data {
-        let filesDirectory = URL(fileURLWithPath: sourceFilesDirectoryPath, isDirectory: true)
+        let filesDirectory = URL(filePath: sourceFilesDirectoryPath, directoryHint: .isDirectory)
         guard
             (try? filesDirectory.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
         else {
             throw WalletOrdersError.noSourceFiles
         }
 
-        let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let tempDir = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString, directoryHint: .isDirectory)
         try FileManager.default.copyItem(at: filesDirectory, to: tempDir)
         defer { try? FileManager.default.removeItem(at: tempDir) }
 
         var archiveFiles: [String: Data] = [:]
 
         let orderJSON = try self.encoder.encode(order)
-        try orderJSON.write(to: tempDir.appendingPathComponent("order.json"))
+        try orderJSON.write(to: tempDir.appending(path: "order.json"))
         archiveFiles["order.json"] = orderJSON
 
-        let sourceFilesPaths = try FileManager.default.subpathsOfDirectory(atPath: tempDir.path)
+        let sourceFilesPaths = try FileManager.default.subpathsOfDirectory(atPath: tempDir.path())
 
         var manifestJSON: [String: String] = [:]
 
         for relativePath in sourceFilesPaths {
-            let fileURL = URL(fileURLWithPath: relativePath, relativeTo: tempDir)
+            let fileURL = URL(filePath: relativePath, relativeTo: tempDir)
 
             guard !fileURL.hasDirectoryPath else {
                 continue

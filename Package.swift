@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "swift-wallet",
     platforms: [
-        .macOS(.v12)
+        .macOS(.v13)
     ],
     products: [
         .library(name: "WalletPasses", targets: ["WalletPasses"]),

@@ -37,7 +37,7 @@ public struct PassBuilder: Sendable {
         self.pemCertificate = pemCertificate
         self.pemPrivateKey = pemPrivateKey
         self.pemPrivateKeyPassword = pemPrivateKeyPassword
-        self.openSSLURL = URL(fileURLWithPath: openSSLPath)
+        self.openSSLURL = URL(filePath: openSSLPath)
     }
 
     /// Generates a signature for a given personalization token.
@@ -50,19 +50,19 @@ public struct PassBuilder: Sendable {
     public func signature(for data: Data) throws -> Data {
         // Swift Crypto doesn't support encrypted PEM private keys, so we have to use OpenSSL for that.
         if let pemPrivateKeyPassword {
-            guard FileManager.default.fileExists(atPath: self.openSSLURL.path) else {
+            guard FileManager.default.fileExists(atPath: self.openSSLURL.path()) else {
                 throw WalletPassesError.noOpenSSLExecutable
             }
 
-            let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+            let tempDir = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString, directoryHint: .isDirectory)
             try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
             defer { try? FileManager.default.removeItem(at: tempDir) }
 
-            let manifestURL = tempDir.appendingPathComponent(Self.manifestFileName)
-            let wwdrURL = tempDir.appendingPathComponent("wwdr.pem")
-            let certificateURL = tempDir.appendingPathComponent("certificate.pem")
-            let privateKeyURL = tempDir.appendingPathComponent("private.pem")
-            let signatureURL = tempDir.appendingPathComponent(Self.signatureFileName)
+            let manifestURL = tempDir.appending(path: Self.manifestFileName)
+            let wwdrURL = tempDir.appending(path: "wwdr.pem")
+            let certificateURL = tempDir.appending(path: "certificate.pem")
+            let privateKeyURL = tempDir.appending(path: "private.pem")
+            let signatureURL = tempDir.appending(path: Self.signatureFileName)
 
             try data.write(to: manifestURL)
             try self.pemWWDRCertificate.write(to: wwdrURL, atomically: true, encoding: .utf8)
@@ -74,11 +74,11 @@ public struct PassBuilder: Sendable {
             process.executableURL = self.openSSLURL
             process.arguments = [
                 "smime", "-binary", "-sign",
-                "-certfile", wwdrURL.path,
-                "-signer", certificateURL.path,
-                "-inkey", privateKeyURL.path,
-                "-in", manifestURL.path,
-                "-out", signatureURL.path,
+                "-certfile", wwdrURL.path(),
+                "-signer", certificateURL.path(),
+                "-inkey", privateKeyURL.path(),
+                "-in", manifestURL.path(),
+                "-out", signatureURL.path(),
                 "-outform", "DER",
                 "-passin", "pass:\(pemPrivateKeyPassword)",
             ]
@@ -114,31 +114,31 @@ public struct PassBuilder: Sendable {
         sourceFilesDirectoryPath: String,
         personalization: PersonalizationJSON? = nil
     ) throws -> Data {
-        let filesDirectory = URL(fileURLWithPath: sourceFilesDirectoryPath, isDirectory: true)
+        let filesDirectory = URL(filePath: sourceFilesDirectoryPath, directoryHint: .isDirectory)
         guard
             (try? filesDirectory.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
         else {
             throw WalletPassesError.noSourceFiles
         }
 
-        let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let tempDir = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString, directoryHint: .isDirectory)
         try FileManager.default.copyItem(at: filesDirectory, to: tempDir)
         defer { try? FileManager.default.removeItem(at: tempDir) }
 
         var archiveFiles: [String: Data] = [:]
 
         let passJSON = try self.encoder.encode(pass)
-        try passJSON.write(to: tempDir.appendingPathComponent("pass.json"))
+        try passJSON.write(to: tempDir.appending(path: "pass.json"))
         archiveFiles["pass.json"] = passJSON
 
         // Pass Personalization
         if let personalization {
             let personalizationJSONData = try self.encoder.encode(personalization)
-            try personalizationJSONData.write(to: tempDir.appendingPathComponent("personalization.json"))
+            try personalizationJSONData.write(to: tempDir.appending(path: "personalization.json"))
             archiveFiles["personalization.json"] = personalizationJSONData
         }
 
-        let sourceFilesPaths = try FileManager.default.subpathsOfDirectory(atPath: tempDir.path)
+        let sourceFilesPaths = try FileManager.default.subpathsOfDirectory(atPath: tempDir.path())
 
         if personalization != nil {
             guard
@@ -163,7 +163,7 @@ public struct PassBuilder: Sendable {
         var manifestJSON: [String: String] = [:]
 
         for relativePath in sourceFilesPaths {
-            let fileURL = URL(fileURLWithPath: relativePath, relativeTo: tempDir)
+            let fileURL = URL(filePath: relativePath, relativeTo: tempDir)
 
             guard !fileURL.hasDirectoryPath else {
                 continue
