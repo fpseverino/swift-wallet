@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "swift-wallet",
     platforms: [
-        .macOS(.v12)
+        .macOS(.v13)
     ],
     products: [
         .library(name: "WalletPasses", targets: ["WalletPasses"]),
@@ -12,14 +12,14 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-certificates.git", from: "1.6.1"),
-        .package(url: "https://github.com/vapor-community/Zip.git", from: "2.2.4"),
+        .package(url: "https://github.com/adam-fowler/swift-zip-archive.git", from: "0.4.1"),
     ],
     targets: [
         .target(
             name: "WalletPasses",
             dependencies: [
                 .product(name: "X509", package: "swift-certificates"),
-                .product(name: "Zip", package: "zip"),
+                .product(name: "ZipArchive", package: "swift-zip-archive"),
             ],
             swiftSettings: swiftSettings
         ),
@@ -37,7 +37,7 @@ let package = Package(
             name: "WalletOrders",
             dependencies: [
                 .product(name: "X509", package: "swift-certificates"),
-                .product(name: "Zip", package: "zip"),
+                .product(name: "ZipArchive", package: "swift-zip-archive"),
             ],
             swiftSettings: swiftSettings
         ),
