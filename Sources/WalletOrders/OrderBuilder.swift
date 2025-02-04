@@ -1,12 +1,7 @@
 import Crypto
+import Foundation
 @_spi(CMS) import X509
 import ZipArchive
-
-#if canImport(FoundationEssentials)
-    import FoundationEssentials
-#else
-    import Foundation
-#endif
 
 /// A tool that generates order content bundles.
 ///
