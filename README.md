@@ -17,15 +17,15 @@ This package provides tools to create passes and orders for the Apple Wallet app
 Use the SPM string to easily include the dependendency in your `Package.swift` file
 
 ```swift
-.package(url: "https://github.com/fpseverino/swift-wallet.git", from: "0.3.0")
+.package(url: "https://github.com/fpseverino/swift-wallet.git", from: "0.4.0"),
 ```
 
 and add the product you want to use to your target's dependencies:
 
 ```swift
-.product(name: "WalletPasses", package: "swift-wallet")
+.product(name: "WalletPasses", package: "swift-wallet"),
 ```
 
 ```swift
-.product(name: "WalletOrders", package: "swift-wallet")
+.product(name: "WalletOrders", package: "swift-wallet"),
 ```
