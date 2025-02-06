@@ -12,7 +12,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-certificates.git", from: "1.6.1"),
-        .package(url: "https://github.com/adam-fowler/swift-zip-archive.git", from: "0.4.1"),
+        .package(url: "https://github.com/adam-fowler/swift-zip-archive.git", from: "0.5.0"),
     ],
     targets: [
         .target(
