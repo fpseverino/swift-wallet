@@ -40,6 +40,7 @@ public struct OrderBuilder: Sendable {
         self.pemPrivateKey = pemPrivateKey
         self.pemPrivateKeyPassword = pemPrivateKeyPassword
         self.openSSLURL = URL(filePath: openSSLPath)
+        self.encoder.dateEncodingStrategy = .iso8601
     }
 
     private func signature(for manifest: Data) throws -> Data {
