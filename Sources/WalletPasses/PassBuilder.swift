@@ -40,6 +40,7 @@ public struct PassBuilder: Sendable {
         self.pemPrivateKey = pemPrivateKey
         self.pemPrivateKeyPassword = pemPrivateKeyPassword
         self.openSSLURL = URL(filePath: openSSLPath)
+        self.encoder.dateEncodingStrategy = .iso8601
     }
 
     /// Generates a signature for a given personalization token.
