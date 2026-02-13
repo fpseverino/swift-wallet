@@ -1,13 +1,8 @@
 import Crypto
+import Foundation
 import Testing
 import WalletOrders
 import ZipArchive
-
-#if canImport(FoundationEssentials)
-import FoundationEssentials
-#else
-import Foundation
-#endif
 
 @Suite("WalletOrders Tests")
 struct WalletOrdersTests {
