@@ -15,7 +15,7 @@ jobs:
       with_linting: true
       with_musl: true
       with_android: true
-      android_copy_files: Tests/WalletPassesTests/SourceFiles Tests/WalletOrdersTests/SourceFiles
+      android_copy_files: Tests
       ios_scheme_name: swift-wallet-Package
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -26,11 +26,9 @@ jobs:
       fail-fast: false
       matrix:
         swift-version:
-          - 6.0
           - 6.1
           - 6.2
         include:
-          - { swift-version: 6.0, swift-branch: swift-6.0.3-release, swift-tag: 6.0.3-RELEASE }
           - { swift-version: 6.1, swift-branch: swift-6.1.3-release, swift-tag: 6.1.3-RELEASE }
           - { swift-version: 6.2, swift-branch: swift-6.2.3-release, swift-tag: 6.2.3-RELEASE }
     runs-on: windows-latest
