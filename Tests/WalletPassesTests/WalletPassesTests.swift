@@ -1,8 +1,13 @@
 import Crypto
-import Foundation
 import Testing
 import WalletPasses
 import ZipArchive
+
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
+import Foundation
+#endif
 
 @Suite("WalletPasses Tests")
 struct WalletPassesTests {
@@ -79,24 +84,6 @@ struct WalletPassesTests {
             try builder.build(
                 pass: pass,
                 sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests/NoSourceFiles"
-            )
-        }
-    }
-
-    @Test("Build Pass without OpenSSL")
-    func buildWithoutOpenSSL() throws {
-        let builder = PassBuilder(
-            pemWWDRCertificate: TestCertificate.pemWWDRCertificate,
-            pemCertificate: TestCertificate.encryptedPemCertificate,
-            pemPrivateKey: TestCertificate.encryptedPemPrivateKey,
-            pemPrivateKeyPassword: "password",
-            openSSLPath: "/usr/bin/no-openssl"
-        )
-
-        #expect(throws: WalletPassesError.noOpenSSLExecutable) {
-            try builder.build(
-                pass: pass,
-                sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests/SourceFiles"
             )
         }
     }

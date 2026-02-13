@@ -6,7 +6,6 @@ public struct WalletPassesError: Error, Sendable, Equatable {
             case noSourceFiles
             case noIcon
             case noPersonalizationLogo
-            case noOpenSSLExecutable
             case invalidNumberOfPasses
         }
 
@@ -22,8 +21,6 @@ public struct WalletPassesError: Error, Sendable, Equatable {
         public static let noIcon = Self(.noIcon)
         /// The `personalizationLogo@XX.png` file is missing.
         public static let noPersonalizationLogo = Self(.noPersonalizationLogo)
-        /// The `openssl` executable is missing.
-        public static let noOpenSSLExecutable = Self(.noOpenSSLExecutable)
         /// The number of passes to bundle is invalid.
         public static let invalidNumberOfPasses = Self(.invalidNumberOfPasses)
 
@@ -62,9 +59,6 @@ public struct WalletPassesError: Error, Sendable, Equatable {
 
     /// The `personalizationLogo@XX.png` file is missing.
     public static let noPersonalizationLogo = Self(errorType: .noPersonalizationLogo)
-
-    /// The `openssl` executable is missing.
-    public static let noOpenSSLExecutable = Self(errorType: .noOpenSSLExecutable)
 
     /// The number of passes to bundle is invalid.
     public static let invalidNumberOfPasses = Self(errorType: .invalidNumberOfPasses)

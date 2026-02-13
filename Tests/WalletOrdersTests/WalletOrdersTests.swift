@@ -1,8 +1,13 @@
 import Crypto
-import Foundation
 import Testing
 import WalletOrders
 import ZipArchive
+
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
+import Foundation
+#endif
 
 @Suite("WalletOrders Tests")
 struct WalletOrdersTests {
@@ -54,24 +59,6 @@ struct WalletOrdersTests {
             try builder.build(
                 order: order,
                 sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletOrdersTests/NoSourceFiles"
-            )
-        }
-    }
-
-    @Test("Build Order without OpenSSL")
-    func buildWithoutOpenSSL() throws {
-        let builder = OrderBuilder(
-            pemWWDRCertificate: TestCertificate.pemWWDRCertificate,
-            pemCertificate: TestCertificate.encryptedPemCertificate,
-            pemPrivateKey: TestCertificate.encryptedPemPrivateKey,
-            pemPrivateKeyPassword: "password",
-            openSSLPath: "/usr/bin/no-openssl"
-        )
-
-        #expect(throws: WalletOrdersError.noOpenSSLExecutable) {
-            try builder.build(
-                order: order,
-                sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletOrdersTests/SourceFiles"
             )
         }
     }

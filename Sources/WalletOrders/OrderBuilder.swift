@@ -1,7 +1,12 @@
-import Crypto
-import Foundation
+import CryptoExtras
 @_spi(CMS) import X509
 import ZipArchive
+
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
+import Foundation
+#endif
 
 /// A tool that generates order content bundles.
 ///
@@ -11,7 +16,6 @@ public struct OrderBuilder: Sendable {
     private let pemCertificate: String
     private let pemPrivateKey: String
     private let pemPrivateKeyPassword: String?
-    private let openSSLURL: URL
 
     private let encoder = JSONEncoder()
 
@@ -27,74 +31,37 @@ public struct OrderBuilder: Sendable {
     ///   - pemCertificate: The PEM Certificate for signing orders.
     ///   - pemPrivateKey: The PEM Certificate's private key for signing orders.
     ///   - pemPrivateKeyPassword: The password to the private key. If the key is not encrypted it must be `nil`. Defaults to `nil`.
-    ///   - openSSLPath: The location of the `openssl` command as a file path.
     public init(
         pemWWDRCertificate: String,
         pemCertificate: String,
         pemPrivateKey: String,
-        pemPrivateKeyPassword: String? = nil,
-        openSSLPath: String = "/usr/bin/openssl"
+        pemPrivateKeyPassword: String? = nil
     ) {
         self.pemWWDRCertificate = pemWWDRCertificate
         self.pemCertificate = pemCertificate
         self.pemPrivateKey = pemPrivateKey
         self.pemPrivateKeyPassword = pemPrivateKeyPassword
-        self.openSSLURL = URL(filePath: openSSLPath)
         self.encoder.dateEncodingStrategy = .iso8601
     }
 
     private func signature(for manifest: Data) throws -> Data {
-        // Swift Crypto doesn't support encrypted PEM private keys, so we have to use OpenSSL for that.
-        if let pemPrivateKeyPassword {
-            guard FileManager.default.fileExists(atPath: self.openSSLURL.path()) else {
-                throw WalletOrdersError.noOpenSSLExecutable
+        let privateKey: _RSA.Signing.PrivateKey =
+            if let pemPrivateKeyPassword {
+                try .init(encryptedPEMRepresentation: self.pemPrivateKey) { $0(pemPrivateKeyPassword.utf8) }
+            } else {
+                try .init(pemRepresentation: self.pemPrivateKey)
             }
-
-            let tempDir = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString, directoryHint: .isDirectory)
-            try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
-            defer { try? FileManager.default.removeItem(at: tempDir) }
-
-            let manifestURL = tempDir.appending(path: Self.manifestFileName)
-            let wwdrURL = tempDir.appending(path: "wwdr.pem")
-            let certificateURL = tempDir.appending(path: "certificate.pem")
-            let privateKeyURL = tempDir.appending(path: "private.pem")
-            let signatureURL = tempDir.appending(path: Self.signatureFileName)
-
-            try manifest.write(to: manifestURL)
-            try self.pemWWDRCertificate.write(to: wwdrURL, atomically: true, encoding: .utf8)
-            try self.pemCertificate.write(to: certificateURL, atomically: true, encoding: .utf8)
-            try self.pemPrivateKey.write(to: privateKeyURL, atomically: true, encoding: .utf8)
-
-            let process = Process()
-            process.currentDirectoryURL = tempDir
-            process.executableURL = self.openSSLURL
-            process.arguments = [
-                "smime", "-binary", "-sign",
-                "-certfile", wwdrURL.path(),
-                "-signer", certificateURL.path(),
-                "-inkey", privateKeyURL.path(),
-                "-in", manifestURL.path(),
-                "-out", signatureURL.path(),
-                "-outform", "DER",
-                "-passin", "pass:\(pemPrivateKeyPassword)",
-            ]
-            try process.run()
-            process.waitUntilExit()
-
-            return try Data(contentsOf: signatureURL)
-        } else {
-            let signature = try CMS.sign(
-                manifest,
-                signatureAlgorithm: .sha256WithRSAEncryption,
-                additionalIntermediateCertificates: [
-                    Certificate(pemEncoded: self.pemWWDRCertificate)
-                ],
-                certificate: Certificate(pemEncoded: self.pemCertificate),
-                privateKey: .init(pemEncoded: self.pemPrivateKey),
-                signingTime: Date.now
-            )
-            return Data(signature)
-        }
+        let signature = try CMS.sign(
+            manifest,
+            signatureAlgorithm: .sha256WithRSAEncryption,
+            additionalIntermediateCertificates: [
+                Certificate(pemEncoded: self.pemWWDRCertificate)
+            ],
+            certificate: Certificate(pemEncoded: self.pemCertificate),
+            privateKey: .init(privateKey),
+            signingTime: Date.now
+        )
+        return Data(signature)
     }
 
     /// Generates the order content bundle for a given order.

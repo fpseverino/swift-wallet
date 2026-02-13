@@ -4,7 +4,6 @@ public struct WalletOrdersError: Error, Sendable, Equatable {
     public struct ErrorType: Sendable, Hashable, CustomStringConvertible, Equatable {
         enum Base: String, Sendable, Equatable {
             case noSourceFiles
-            case noOpenSSLExecutable
         }
 
         let base: Base
@@ -15,8 +14,6 @@ public struct WalletOrdersError: Error, Sendable, Equatable {
 
         /// The path for the source files is not a directory.
         public static let noSourceFiles = Self(.noSourceFiles)
-        /// The `openssl` executable is missing.
-        public static let noOpenSSLExecutable = Self(.noOpenSSLExecutable)
 
         /// A textual representation of this error.
         public var description: String {
@@ -47,9 +44,6 @@ public struct WalletOrdersError: Error, Sendable, Equatable {
 
     /// The path for the source files is not a directory.
     public static let noSourceFiles = Self(errorType: .noSourceFiles)
-
-    /// The `openssl` executable is missing.
-    public static let noOpenSSLExecutable = Self(errorType: .noOpenSSLExecutable)
 
     public static func == (lhs: WalletOrdersError, rhs: WalletOrdersError) -> Bool {
         lhs.backing == rhs.backing

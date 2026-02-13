@@ -1,5 +1,10 @@
-import Foundation
 import WalletPasses
+
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
+import Foundation
+#endif
 
 struct TestPass: PassJSON.Properties, Decodable {
     var description = "Test Pass"
