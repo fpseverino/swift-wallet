@@ -14,6 +14,14 @@ struct WalletPassesTests {
     let decoder = JSONDecoder()
     let pass = TestPass()
 
+    private static let sourceFilesDirectory: String =
+        Bundle.module.path(forResource: "SourceFiles", ofType: nil)
+        ?? "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests/SourceFiles"
+
+    private static let emptySourceFilesDirectory: String =
+        Bundle.module.path(forResource: "EmptyDir", ofType: nil, inDirectory: "SourceFiles")
+        ?? "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests/SourceFiles/EmptyDir"
+
     @Test("Build Pass")
     func build() throws {
         let builder = PassBuilder(
@@ -24,7 +32,7 @@ struct WalletPassesTests {
 
         let bundle = try builder.build(
             pass: pass,
-            sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests/SourceFiles"
+            sourceFilesDirectoryPath: Self.sourceFilesDirectory
         )
 
         try testRoundTripped(bundle)
@@ -41,7 +49,7 @@ struct WalletPassesTests {
 
         let bundle = try builder.build(
             pass: pass,
-            sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests/SourceFiles"
+            sourceFilesDirectoryPath: Self.sourceFilesDirectory
         )
 
         try testRoundTripped(bundle)
@@ -65,7 +73,7 @@ struct WalletPassesTests {
 
         let bundle = try builder.build(
             pass: pass,
-            sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests/SourceFiles",
+            sourceFilesDirectoryPath: Self.sourceFilesDirectory,
             personalization: testPersonalization
         )
 
@@ -83,7 +91,7 @@ struct WalletPassesTests {
         #expect(throws: WalletPassesError.noSourceFiles) {
             try builder.build(
                 pass: pass,
-                sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests/NoSourceFiles"
+                sourceFilesDirectoryPath: Self.sourceFilesDirectory + "/../NoSourceFiles"
             )
         }
     }
@@ -99,7 +107,7 @@ struct WalletPassesTests {
         #expect(throws: WalletPassesError.noIcon) {
             try builder.build(
                 pass: pass,
-                sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests"
+                sourceFilesDirectoryPath: Self.emptySourceFilesDirectory
             )
         }
     }
@@ -123,7 +131,7 @@ struct WalletPassesTests {
         #expect(throws: WalletPassesError.noPersonalizationLogo) {
             try builder.build(
                 pass: pass,
-                sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletPassesTests",
+                sourceFilesDirectoryPath: Self.emptySourceFilesDirectory,
                 personalization: testPersonalization
             )
         }

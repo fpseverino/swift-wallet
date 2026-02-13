@@ -14,6 +14,10 @@ struct WalletOrdersTests {
     let decoder = JSONDecoder()
     let order = TestOrder()
 
+    private static let sourceFilesDirectory: String =
+        Bundle.module.path(forResource: "SourceFiles", ofType: nil)
+        ?? "\(FileManager.default.currentDirectoryPath)/Tests/WalletOrdersTests/SourceFiles"
+
     @Test("Build Order")
     func build() throws {
         let builder = OrderBuilder(
@@ -24,7 +28,7 @@ struct WalletOrdersTests {
 
         let bundle = try builder.build(
             order: order,
-            sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletOrdersTests/SourceFiles"
+            sourceFilesDirectoryPath: Self.sourceFilesDirectory
         )
 
         try testRoundTripped(bundle)
@@ -41,7 +45,7 @@ struct WalletOrdersTests {
 
         let bundle = try builder.build(
             order: order,
-            sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletOrdersTests/SourceFiles"
+            sourceFilesDirectoryPath: Self.sourceFilesDirectory
         )
 
         try testRoundTripped(bundle)
@@ -58,7 +62,7 @@ struct WalletOrdersTests {
         #expect(throws: WalletOrdersError.noSourceFiles) {
             try builder.build(
                 order: order,
-                sourceFilesDirectoryPath: "\(FileManager.default.currentDirectoryPath)/Tests/WalletOrdersTests/NoSourceFiles"
+                sourceFilesDirectoryPath: Self.sourceFilesDirectory + "/../NoSourceFiles"
             )
         }
     }
