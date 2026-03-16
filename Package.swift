@@ -14,7 +14,7 @@ let package = Package(
         .library(name: "WalletOrders", targets: ["WalletOrders"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/fpseverino/swift-crypto.git", branch: "encrypted-pem-keys"),
+        .package(url: "https://github.com/apple/swift-crypto.git", from: "4.3.0"),
         .package(url: "https://github.com/apple/swift-certificates.git", from: "1.15.1"),
         .package(url: "https://github.com/adam-fowler/swift-zip-archive.git", from: "0.6.4"),
     ],
