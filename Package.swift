@@ -4,20 +4,25 @@ import PackageDescription
 let package = Package(
     name: "swift-wallet",
     platforms: [
-        .macOS(.v13)
+        .macOS(.v13),
+        .iOS(.v16),
+        .tvOS(.v16),
+        .watchOS(.v9),
     ],
     products: [
         .library(name: "WalletPasses", targets: ["WalletPasses"]),
         .library(name: "WalletOrders", targets: ["WalletOrders"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-certificates.git", from: "1.6.1"),
-        .package(url: "https://github.com/adam-fowler/swift-zip-archive.git", from: "0.5.0"),
+        .package(url: "https://github.com/apple/swift-crypto.git", from: "4.3.0"),
+        .package(url: "https://github.com/apple/swift-certificates.git", from: "1.15.1"),
+        .package(url: "https://github.com/adam-fowler/swift-zip-archive.git", from: "0.6.4"),
     ],
     targets: [
         .target(
             name: "WalletPasses",
             dependencies: [
+                .product(name: "CryptoExtras", package: "swift-crypto"),
                 .product(name: "X509", package: "swift-certificates"),
                 .product(name: "ZipArchive", package: "swift-zip-archive"),
             ],
@@ -36,6 +41,7 @@ let package = Package(
         .target(
             name: "WalletOrders",
             dependencies: [
+                .product(name: "CryptoExtras", package: "swift-crypto"),
                 .product(name: "X509", package: "swift-certificates"),
                 .product(name: "ZipArchive", package: "swift-zip-archive"),
             ],

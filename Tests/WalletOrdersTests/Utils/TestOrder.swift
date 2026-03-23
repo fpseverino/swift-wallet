@@ -1,5 +1,10 @@
-import Foundation
 import WalletOrders
+
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
+import Foundation
+#endif
 
 struct TestOrder: OrderJSON.Properties, Decodable {
     var schemaVersion = OrderJSON.SchemaVersion.v1

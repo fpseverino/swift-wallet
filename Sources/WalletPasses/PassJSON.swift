@@ -28,6 +28,12 @@ public enum PassJSON {
         /// The Team ID for the Apple Developer Program account that registered the pass type identifier.
         var teamIdentifier: String { get }
     }
+
+    /// The version of the file format.
+    public enum FormatVersion: Int, Codable, Sendable {
+        /// The value must be `1`.
+        case v1 = 1
+    }
 }
 
 extension PassJSON {
@@ -58,6 +64,15 @@ extension PassJSON {
         /// such as showing an airplane icon for the pass on watchOS when the value is set to `PKTransitTypeAir`.
         var transitType: TransitType { get }
     }
+
+    /// The type of transit for a boarding pass.
+    public enum TransitType: String, Codable, Sendable {
+        case air = "PKTransitTypeAir"
+        case boat = "PKTransitTypeBoat"
+        case bus = "PKTransitTypeBus"
+        case generic = "PKTransitTypeGeneric"
+        case train = "PKTransitTypeTrain"
+    }
 }
 
 extension PassJSON {
@@ -77,6 +92,14 @@ extension PassJSON {
         /// from a string representation to a data representation that the system renders as a barcode, such as `iso-8859-1`.
         var messageEncoding: String { get }
     }
+
+    /// The format of the barcode.
+    public enum BarcodeFormat: String, Codable, Sendable {
+        case pdf417 = "PKBarcodeFormatPDF417"
+        case qr = "PKBarcodeFormatQR"
+        case aztec = "PKBarcodeFormatAztec"
+        case code128 = "PKBarcodeFormatCode128"
+    }
 }
 
 extension PassJSON {
@@ -89,6 +112,16 @@ extension PassJSON {
 
         /// (Required)
         var longitude: Double { get }
+    }
+}
+
+extension PassJSON {
+    /// An object that represents the identifier of a Bluetooth Low Energy beacon the system uses to show a relevant pass.
+    ///
+    /// > Tip: See the [`Pass.Beacons`](https://developer.apple.com/documentation/walletpasses/pass/beacons-data.dictionary) object to understand the keys.
+    public protocol Beacons: Encodable, Sendable {
+        /// The unique identifier of a Bluetooth Low Energy location beacon.
+        var proximityUUID: String { get }
     }
 }
 
@@ -107,30 +140,5 @@ extension PassJSON {
         ///
         /// Use a Base64-encoded X.509 SubjectPublicKeyInfo structure that contains an ECDH public key for group P256.
         var encryptionPublicKey: String { get }
-    }
-}
-
-extension PassJSON {
-    /// The version of the file format.
-    public enum FormatVersion: Int, Codable, Sendable {
-        /// The value must be `1`.
-        case v1 = 1
-    }
-
-    /// The type of transit for a boarding pass.
-    public enum TransitType: String, Codable, Sendable {
-        case air = "PKTransitTypeAir"
-        case boat = "PKTransitTypeBoat"
-        case bus = "PKTransitTypeBus"
-        case generic = "PKTransitTypeGeneric"
-        case train = "PKTransitTypeTrain"
-    }
-
-    /// The format of the barcode.
-    public enum BarcodeFormat: String, Codable, Sendable {
-        case pdf417 = "PKBarcodeFormatPDF417"
-        case qr = "PKBarcodeFormatQR"
-        case aztec = "PKBarcodeFormatAztec"
-        case code128 = "PKBarcodeFormatCode128"
     }
 }
