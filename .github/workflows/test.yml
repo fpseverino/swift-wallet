@@ -62,5 +62,4 @@ jobs:
       - name: Run unit tests
         shell: pwsh
         run: |
-          $env:LIB = "$env:GITHUB_WORKSPACE\zlib-132\install\lib;$env:LIB"
-          swift test -Xcc -I"$env:GITHUB_WORKSPACE/zlib-132/install/include"
+          swift test -Xcc -I"$env:GITHUB_WORKSPACE/zlib-132/install/include" -Xlinker "/LIBPATH:$env:GITHUB_WORKSPACE\zlib-132\install\lib"
