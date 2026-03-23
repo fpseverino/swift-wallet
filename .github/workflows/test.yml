@@ -60,7 +60,7 @@ jobs:
         run: |
           Copy-Item zlib-132/install/lib/zs.lib zlib-132/install/lib/zlibstatic.lib
       - name: Run unit tests
-        env:
-          LIB: ${{ github.workspace }}\zlib-132\install\lib;${{ env.LIB }}
+        shell: pwsh
         run: |
-          swift test -Xcc -I"${{ github.workspace }}/zlib-132/install/include"
+          $env:LIB = "$env:GITHUB_WORKSPACE\zlib-132\install\lib;$env:LIB"
+          swift test -Xcc -I"$env:GITHUB_WORKSPACE/zlib-132/install/include"
