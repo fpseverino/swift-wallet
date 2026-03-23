@@ -55,6 +55,10 @@ jobs:
           cmake ..
           cmake --build . --config Release
           cmake --install . --prefix ../install
+      - name: Prepare zlib library name for Swift
+        shell: pwsh
+        run: |
+          Copy-Item zlib-132/install/lib/zs.lib zlib-132/install/lib/zlibstatic.lib
       - name: Run unit tests
         run: |
-          swift test -Xcc -I"${{ github.workspace }}/zlib-132/install/include" -Xlinker -L"${{ github.workspace }}/zlib-132/install/lib"
+          swift test -Xcc -I"${{ github.workspace }}/zlib-132/install/include" -Xlinker -LIBPATH:"${{ github.workspace }}/zlib-132/install/lib"
