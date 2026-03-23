@@ -40,6 +40,8 @@ jobs:
           swift-version: ${{ matrix.swift-branch }}
           swift-build: ${{ matrix.swift-tag }}
           update-sdk-modules: true
+      - name: Check out code
+        uses: actions/checkout@v6
       - name: Download zlib
         run: |
           curl -L -o zlib.zip https://www.zlib.net/zlib132.zip
@@ -53,8 +55,6 @@ jobs:
           cmake ..
           cmake --build . --config Release
           cmake --install . --prefix ../install
-      - name: Check out code
-        uses: actions/checkout@v6
       - name: Run unit tests
         run: |
-          swift test -Xcc -I'C:/Program Files (x86)/zlib/include' -Xlinker -L'C:/Program Files (x86)/zlib/lib'
+          swift test -Xcc -I"${{ github.workspace }}/zlib-132/install/include" -Xlinker -L"${{ github.workspace }}/zlib-132/install/lib"
