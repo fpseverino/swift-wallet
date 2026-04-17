@@ -1,13 +1,8 @@
 import CryptoExtras
+public import Foundation
 import SwiftASN1
 @_spi(CMS) import X509
 import ZipArchive
-
-#if canImport(FoundationEssentials)
-public import FoundationEssentials
-#else
-public import Foundation
-#endif
 
 /// A tool that generates pass content bundles.
 ///
