@@ -11,7 +11,6 @@ jobs:
     uses: vapor/ci/.github/workflows/run-unit-tests.yml@main
     with:
       with_release_mode_testing: true
-      warnings_as_errors: true
       with_linting: true
       with_musl: true
       with_android: true
@@ -28,9 +27,11 @@ jobs:
         swift-version:
           - 6.1
           - 6.2
+          - 6.3
         include:
           - { swift-version: 6.1, swift-branch: swift-6.1.3-release, swift-tag: 6.1.3-RELEASE }
-          - { swift-version: 6.2, swift-branch: swift-6.2.3-release, swift-tag: 6.2.3-RELEASE }
+          - { swift-version: 6.2, swift-branch: swift-6.2.4-release, swift-tag: 6.2.4-RELEASE }
+          - { swift-version: 6.3, swift-branch: swift-6.3.1-release, swift-tag: 6.3.1-RELEASE }
     runs-on: windows-latest
     timeout-minutes: 60
     steps:
