@@ -1,5 +1,6 @@
 import Crypto
 import Foundation
+import SystemPackage
 import Testing
 import WalletPasses
 import ZipArchive

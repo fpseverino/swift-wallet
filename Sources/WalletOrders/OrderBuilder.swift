@@ -1,11 +1,12 @@
 import CryptoExtras
+import SwiftASN1
 @_spi(CMS) import X509
 import ZipArchive
 
 #if canImport(FoundationEssentials)
-import FoundationEssentials
+public import FoundationEssentials
 #else
-import Foundation
+public import Foundation
 #endif
 
 /// A tool that generates order content bundles.
